@@ -1,0 +1,2948 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>万象 Agentic AutoML - 交互式演示平台</title>
+    <style>
+        :root {
+            --primary-color: #8a1c52;
+            /* 主题紫红 */
+            --bg-main: #f8fafc;
+            --box-bg: #ffffff;
+            --text-main: #1e293b;
+            --text-muted: #64748b;
+            --accent-blue: #3b82f6;
+            --accent-green: #10b981;
+            --border-color: #e2e8f0;
+            --input-border: #db2777;
+            --output-border: #d97706;
+            --sandbox-border: #475569;
+            --feedback-border: #f59e0b;
+            --feedback-bg: #fffbeb;
+            --line-color: #cbd5e1;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', "Microsoft YaHei", sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-main);
+            color: var(--text-main);
+            overflow-x: hidden;
+        }
+
+        /* 视图切换容器 */
+        .view-container {
+            width: 100vw;
+            min-height: 100vh;
+            display: none;
+            flex-direction: column;
+            align-items: center;
+            padding-bottom: 50px;
+            animation: fadeIn 0.4s ease-out;
+        }
+
+        .view-container.active {
+            display: flex;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* ================= 首页：头部区 ================= */
+        .header {
+            text-align: center;
+            margin-top: 40px;
+            margin-bottom: 0px;
+        }
+
+        .header h1 {
+            font-size: 2.2rem;
+            color: var(--primary-color);
+            letter-spacing: 2px;
+            margin-bottom: 8px;
+        }
+
+        .header p {
+            color: var(--text-muted);
+            font-size: 1.1rem;
+        }
+
+        /* ================= 首页：系统框图区 (高保真还原) ================= */
+        .canvas-wrapper {
+            width: 100%;
+            display: flex;
+            justify-content: center;
+            margin-bottom: 20px;
+            transform: scale(0.85);
+            /* 缩放画布以适应屏幕宽度 */
+            transform-origin: top center;
+        }
+
+        .canvas {
+            position: relative;
+            width: 1350px;
+            height: 620px;
+        }
+
+        /* 大闭环外框 */
+        .loop-border {
+            position: absolute;
+            top: 20px;
+            left: 130px;
+            width: 1065px;
+            height: 580px;
+            border: 3px solid #f9a8d4;
+            border-radius: 40px;
+            z-index: 1;
+            pointer-events: none;
+        }
+
+        .loop-tag {
+            position: absolute;
+            top: -15px;
+            left: 50px;
+            background-color: var(--primary-color);
+            color: white;
+            padding: 5px 20px;
+            border-radius: 8px;
+            font-weight: bold;
+            font-size: 1.1rem;
+        }
+
+        /* 侧边面板 (输入 / 输出) */
+        .side-panel {
+            position: absolute;
+            background: var(--box-bg);
+            border: 2px solid;
+            border-radius: 16px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 20px 10px;
+            z-index: 10;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+        }
+
+        .side-title {
+            font-weight: bold;
+            font-size: 1.2rem;
+            margin-bottom: 15px;
+            background: var(--box-bg);
+            padding: 0 5px;
+        }
+
+        .side-item {
+            border: 1px solid #cbd5e1;
+            border-radius: 8px;
+            padding: 8px;
+            text-align: center;
+            width: 75px;
+            margin-bottom: 12px;
+            background: #f8fafc;
+        }
+
+        .side-item:last-child {
+            margin-bottom: 0;
+        }
+
+        .side-icon {
+            font-size: 1.8rem;
+            margin-bottom: 2px;
+        }
+
+        .side-text {
+            font-size: 0.75rem;
+            color: #475569;
+            font-weight: bold;
+        }
+
+        #panel-input {
+            top: 120px;
+            left: 0px;
+            width: 100px;
+            border-color: var(--input-border);
+        }
+
+        #panel-input .side-title {
+            color: var(--input-border);
+        }
+
+        .icon-p {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 30px;
+            height: 30px;
+            background: var(--primary-color);
+            color: white;
+            border-radius: 50%;
+            font-size: 1rem;
+            margin-bottom: 2px;
+            font-weight: bold;
+        }
+
+        #panel-output {
+            top: 160px;
+            left: 1220px;
+            width: 100px;
+            border-color: var(--output-border);
+            padding: 30px 10px;
+        }
+
+        #panel-output .side-title {
+            color: var(--output-border);
+        }
+
+        #panel-output .side-item {
+            width: 80px;
+            margin-bottom: 40px;
+        }
+
+        /* 核心模块节点 (可点击 Agent) */
+        .node {
+            position: absolute;
+            background: var(--box-bg);
+            border: 2px solid var(--primary-color);
+            border-radius: 12px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            z-index: 10;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        /* 交互反馈：悬停与激活 */
+        .node:hover {
+            transform: translateY(-5px) scale(1.02);
+            box-shadow: 0 10px 25px rgba(138, 28, 82, 0.2);
+            background: #fdf2f8;
+        }
+
+        .node:active {
+            transform: scale(0.98);
+        }
+
+        .node-title {
+            font-size: 1.3rem;
+            font-weight: bold;
+            color: var(--primary-color);
+            margin-bottom: 8px;
+            pointer-events: none;
+        }
+
+        .node-desc {
+            font-size: 0.95rem;
+            color: #64748b;
+            text-align: center;
+            line-height: 1.5;
+            pointer-events: none;
+        }
+
+        /* 具体节点定位与尺寸微调 */
+        #node-data {
+            top: 220px;
+            left: 160px;
+            width: 200px;
+            height: 130px;
+        }
+
+        #node-automl {
+            top: 120px;
+            left: 400px;
+            width: 500px;
+            height: 350px;
+            border-width: 3px;
+            justify-content: flex-start;
+            padding-top: 15px;
+        }
+
+        #node-predict {
+            top: 130px;
+            left: 950px;
+            width: 220px;
+            height: 120px;
+        }
+
+        #node-diagnose {
+            top: 330px;
+            left: 950px;
+            width: 220px;
+            height: 120px;
+        }
+
+        #node-feedback {
+            top: 490px;
+            left: 400px;
+            width: 770px;
+            height: 60px;
+            border-color: var(--feedback-border);
+            border-radius: 30px;
+            background: var(--feedback-bg);
+            flex-direction: row;
+            cursor: pointer;
+        }
+
+        #node-feedback:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 24px rgba(180, 83, 9, 0.16);
+            background: #fff7d6;
+        }
+
+        #node-feedback .node-title {
+            margin-bottom: 0;
+            color: #b45309;
+        }
+
+        /* 新增：沙盒环境 Sandbox Environment */
+        .sandbox-env {
+            position: relative;
+            width: 92%;
+            margin: 15px auto 0;
+            padding: 20px 15px 15px 15px;
+            border: 2px solid var(--sandbox-border);
+            border-radius: 8px;
+            background: #f8fafc;
+            pointer-events: none;
+        }
+
+        .sandbox-title {
+            position: absolute;
+            top: -12px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: var(--box-bg);
+            padding: 0 10px;
+            font-weight: 900;
+            color: var(--text-main);
+            font-size: 1rem;
+            letter-spacing: 1px;
+            border-radius: 4px;
+        }
+
+        /* AutoML 内部布局 */
+        .automl-inner {
+            display: flex;
+            gap: 15px;
+            width: 100%;
+            pointer-events: none;
+        }
+
+        .sub-box {
+            flex: 1;
+            border: 2px solid;
+            border-radius: 8px;
+            padding: 15px 10px;
+            text-align: center;
+            background: #fff;
+        }
+
+        .sub-box h4 {
+            margin-bottom: 10px;
+            font-size: 1.1rem;
+        }
+
+        .sub-box-desc {
+            font-size: 0.8rem;
+            color: #475569;
+            line-height: 1.4;
+        }
+
+        .automl-footer {
+            margin-top: 15px;
+            border: 1px solid var(--feedback-border);
+            color: #b45309;
+            padding: 8px 20px;
+            border-radius: 20px;
+            font-size: 0.9rem;
+            font-weight: bold;
+            width: 92%;
+            text-align: center;
+            pointer-events: none;
+        }
+
+        /* 连接线条 */
+        .connector {
+            position: absolute;
+            background-color: var(--line-color);
+            z-index: 5;
+        }
+
+        .connector::after {
+            content: '';
+            position: absolute;
+            width: 0;
+            height: 0;
+            border-style: solid;
+        }
+
+        /* 线条具体定位 */
+        #line0 {
+            top: 285px;
+            left: 100px;
+            width: 60px;
+            height: 3px;
+        }
+
+        #line0::after {
+            right: -10px;
+            top: -6px;
+            border-width: 7px 0 7px 10px;
+            border-color: transparent transparent transparent var(--line-color);
+        }
+
+        #line1 {
+            top: 285px;
+            left: 360px;
+            width: 40px;
+            height: 3px;
+        }
+
+        #line1::after {
+            right: -10px;
+            top: -6px;
+            border-width: 7px 0 7px 10px;
+            border-color: transparent transparent transparent var(--line-color);
+        }
+
+        #line2 {
+            top: 190px;
+            left: 900px;
+            width: 50px;
+            height: 3px;
+        }
+
+        #line2::after {
+            right: -10px;
+            top: -6px;
+            border-width: 7px 0 7px 10px;
+            border-color: transparent transparent transparent var(--line-color);
+        }
+
+        #line3 {
+            top: 250px;
+            left: 1060px;
+            width: 3px;
+            height: 80px;
+        }
+
+        #line3::after {
+            bottom: -10px;
+            left: -6px;
+            border-width: 10px 7px 0 7px;
+            border-color: var(--line-color) transparent transparent transparent;
+        }
+
+        #line-out1 {
+            top: 190px;
+            left: 1170px;
+            width: 50px;
+            height: 3px;
+        }
+
+        #line-out1::after {
+            right: -10px;
+            top: -6px;
+            border-width: 7px 0 7px 10px;
+            border-color: transparent transparent transparent var(--line-color);
+        }
+
+        #line-out2 {
+            top: 390px;
+            left: 1170px;
+            width: 50px;
+            height: 3px;
+        }
+
+        #line-out2::after {
+            right: -10px;
+            top: -6px;
+            border-width: 7px 0 7px 10px;
+            border-color: transparent transparent transparent var(--line-color);
+        }
+
+        #line4 {
+            top: 450px;
+            left: 1060px;
+            width: 3px;
+            height: 40px;
+        }
+
+        #line4::after {
+            bottom: -10px;
+            left: -6px;
+            border-width: 10px 7px 0 7px;
+            border-color: var(--line-color) transparent transparent transparent;
+        }
+
+        #line5 {
+            top: 450px;
+            left: 650px;
+            width: 3px;
+            height: 40px;
+        }
+
+        #line5::after {
+            top: -10px;
+            left: -6px;
+            border-width: 0 7px 10px 7px;
+            border-color: transparent transparent var(--line-color) transparent;
+        }
+
+        /* ================= 模块详情弹窗 (Modal) ================= */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background: rgba(15, 23, 42, 0.5);
+            backdrop-filter: blur(5px);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+        }
+
+        .modal-overlay.active {
+            display: flex;
+            animation: fadeIn 0.3s ease-out;
+        }
+
+        .modal-content {
+            background: var(--box-bg);
+            width: 650px;
+            border-radius: 16px;
+            padding: 30px;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.3);
+            border: 2px solid var(--primary-color);
+            transform: scale(0.8);
+            transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+
+        .modal-overlay.active .modal-content {
+            transform: scale(1);
+        }
+
+        .modal-header {
+            font-size: 1.6rem;
+            font-weight: bold;
+            color: var(--primary-color);
+            margin-bottom: 15px;
+            border-bottom: 1px solid var(--border-color);
+            padding-bottom: 10px;
+        }
+
+        .modal-biz-value {
+            font-size: 1.1rem;
+            line-height: 1.6;
+            color: var(--text-main);
+            margin-bottom: 20px;
+            font-weight: 500;
+        }
+
+        .modal-visual {
+            width: 100%;
+            min-height: 240px;
+            background: #f8fafc;
+            border: 2px dashed #cbd5e1;
+            border-radius: 8px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            color: var(--text-muted);
+            margin-bottom: 25px;
+            font-size: 1.1rem;
+            padding: 12px;
+            overflow: hidden;
+        }
+        .modal-visual svg { width: 100%; height: auto; max-height: 260px; }
+        .visual-caption { width:100%; text-align:center; font-size:0.85rem; color:#64748b; margin-top:6px; }
+
+        /* AutoML 动画：分流路径流动效果 */
+        @keyframes dashFlow {
+            to { stroke-dashoffset: -20; }
+        }
+        .automl-flow {
+            stroke-dasharray: 6 4;
+            animation: dashFlow 0.8s linear infinite;
+        }
+        @keyframes nodePulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.6; }
+        }
+        .automl-pulse {
+            animation: nodePulse 1.6s ease-in-out infinite;
+        }
+
+        .btn-return-modal {
+            display: block;
+            width: 100%;
+            padding: 12px;
+            background: var(--primary-color);
+            color: white;
+            text-align: center;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 1.1rem;
+            font-weight: bold;
+            border: none;
+            transition: 0.2s;
+        }
+
+        .btn-return-modal:hover {
+            background: #6b153f;
+        }
+
+        /* ================= 首页：场景入口区 ================= */
+        .scenario-entry {
+            text-align: center;
+            width: 1100px;
+            margin-top: -30px;
+        }
+
+        .entry-title {
+            display: inline-block;
+            background: var(--text-main);
+            color: white;
+            padding: 10px 30px;
+            border-radius: 30px;
+            font-size: 1.2rem;
+            font-weight: bold;
+            margin-bottom: 25px;
+            letter-spacing: 1px;
+        }
+
+        .cards-wrapper {
+            display: flex;
+            gap: 20px;
+            justify-content: space-between;
+        }
+
+        .card {
+            flex: 1;
+            background: var(--box-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 25px 20px;
+            cursor: pointer;
+            transition: all 0.3s;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.02);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .card:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.08);
+            border-color: var(--accent-blue);
+        }
+
+        .card-icon {
+            font-size: 2.5rem;
+            margin-bottom: 15px;
+        }
+
+        .card-title {
+            font-size: 1.2rem;
+            font-weight: bold;
+            color: var(--text-main);
+            margin-bottom: 10px;
+        }
+
+        .card-desc {
+            font-size: 0.9rem;
+            color: var(--text-muted);
+            line-height: 1.5;
+            text-align: center;
+        }
+
+        /* ================= 场景详情页 ================= */
+        .scenario-header {
+            max-width: 900px;
+            text-align: center;
+            margin: 40px auto 30px;
+        }
+
+        .scenario-header h2 {
+            font-size: 2rem;
+            color: var(--text-main);
+            margin-bottom: 15px;
+        }
+
+        .scenario-context {
+            font-size: 1.1rem;
+            color: var(--text-muted);
+            line-height: 1.6;
+            background: #f1f5f9;
+            padding: 15px 25px;
+            border-radius: 8px;
+        }
+
+        .video-wrapper {
+            width: 900px;
+            height: 500px;
+            background: #000;
+            border-radius: 16px;
+            margin: 0 auto 30px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            position: relative;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15);
+        }
+
+        .play-btn {
+            width: 80px;
+            height: 80px;
+            background: rgba(255, 255, 255, 0.2);
+            border: 4px solid white;
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+
+        .play-btn:hover {
+            background: rgba(255, 255, 255, 0.4);
+            transform: scale(1.1);
+        }
+
+        .play-icon {
+            width: 0;
+            height: 0;
+            border-style: solid;
+            border-width: 15px 0 15px 25px;
+            border-color: transparent transparent transparent white;
+            margin-left: 8px;
+        }
+
+        .value-statement {
+            max-width: 900px;
+            text-align: center;
+            margin: 0 auto 40px;
+            padding: 25px;
+            border-left: 6px solid var(--accent-blue);
+            background: var(--box-bg);
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+        }
+
+        .value-statement p {
+            font-size: 1.4rem;
+            font-weight: bold;
+            color: var(--text-main);
+            line-height: 1.6;
+        }
+
+        .btn-return-home {
+            display: inline-block;
+            padding: 12px 35px;
+            background: var(--text-main);
+            color: white;
+            border-radius: 30px;
+            cursor: pointer;
+            font-size: 1.1rem;
+            font-weight: bold;
+            transition: 0.3s;
+        }
+
+        .btn-return-home:hover {
+            background: #334155;
+            transform: scale(1.05);
+        }
+
+        /* ================= 首页：双入口导航条 ================= */
+        .top-entries {
+            display: flex;
+            gap: 16px;
+            justify-content: center;
+            margin: 18px 0 6px;
+        }
+        .entry-pill {
+            background: var(--box-bg);
+            border: 2px solid var(--primary-color);
+            color: var(--primary-color);
+            padding: 10px 26px;
+            border-radius: 30px;
+            font-size: 1.05rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: 0.25s;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.04);
+        }
+        .entry-pill:hover {
+            background: var(--primary-color);
+            color: #fff;
+            transform: translateY(-2px);
+        }
+
+        /* ================= 场景页：真实视频接入 ================= */
+        .video-wrapper video {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+            background: #000;
+        }
+
+        /* ================= 四大核心模块：交互动画实验台 ================= */
+        .modal-content {
+            width: min(1040px, calc(100vw - 40px));
+            max-height: calc(100vh - 40px);
+            overflow-y: auto;
+        }
+
+        .modal-visual {
+            min-height: 430px;
+            display: block;
+            background: linear-gradient(145deg, #fbfdff 0%, #f8fafc 100%);
+            border-style: solid;
+            padding: 18px;
+        }
+
+        .module-lab {
+            --lab-route: #8a1c52;
+            width: 100%;
+            color: var(--text-main);
+        }
+
+        .lab-toolbar,
+        .lab-presets,
+        .lab-actions,
+        .lab-status,
+        .lab-metrics {
+            display: flex;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        .lab-toolbar {
+            justify-content: space-between;
+            margin-bottom: 14px;
+        }
+
+        .lab-kicker {
+            color: var(--text-muted);
+            font-size: 0.82rem;
+            font-weight: 700;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+        }
+
+        .lab-button,
+        .lab-preset {
+            appearance: none;
+            border: 1px solid #cbd5e1;
+            border-radius: 999px;
+            background: #fff;
+            color: #475569;
+            padding: 7px 13px;
+            font: inherit;
+            font-size: 0.84rem;
+            font-weight: 700;
+            cursor: pointer;
+            transition: transform 0.2s, border-color 0.2s, background 0.2s, color 0.2s;
+        }
+
+        .lab-button:hover,
+        .lab-preset:hover {
+            transform: translateY(-1px);
+            border-color: var(--primary-color);
+        }
+
+        .lab-button.primary,
+        .lab-preset.active {
+            background: var(--primary-color);
+            border-color: var(--primary-color);
+            color: #fff;
+        }
+
+        .automl-stage {
+            position: relative;
+            display: grid;
+            grid-template-columns: 235px minmax(160px, 1fr) 270px;
+            gap: 18px;
+            min-height: 300px;
+            align-items: stretch;
+        }
+
+        .signal-panel,
+        .router-panel,
+        .route-card,
+        .process-card,
+        .diagnose-summary {
+            background: #fff;
+            border: 1px solid var(--border-color);
+            border-radius: 14px;
+            box-shadow: 0 8px 24px rgba(15, 23, 42, 0.06);
+        }
+
+        .signal-panel {
+            padding: 14px;
+        }
+
+        .signal-panel h4,
+        .route-card h4,
+        .process-card h4 {
+            margin-bottom: 11px;
+            color: var(--text-main);
+            font-size: 0.98rem;
+        }
+
+        .signal-control {
+            margin-bottom: 12px;
+        }
+
+        .signal-label {
+            display: flex;
+            justify-content: space-between;
+            gap: 10px;
+            margin-bottom: 5px;
+            color: #475569;
+            font-size: 0.8rem;
+            font-weight: 700;
+        }
+
+        .signal-control input[type="range"] {
+            width: 100%;
+            accent-color: var(--primary-color);
+            cursor: pointer;
+        }
+
+        .site-switch {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 6px;
+        }
+
+        .site-switch button {
+            border-radius: 8px;
+            padding: 7px 5px;
+        }
+
+        .router-panel {
+            position: relative;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            padding: 18px 14px;
+            text-align: center;
+            isolation: isolate;
+        }
+
+        .router-panel::before {
+            content: '';
+            position: absolute;
+            width: 150px;
+            height: 150px;
+            border: 22px solid color-mix(in srgb, var(--lab-route) 12%, transparent);
+            border-radius: 50%;
+            z-index: -1;
+            transition: border-color 0.35s;
+        }
+
+        .router-core {
+            width: 98px;
+            height: 98px;
+            border-radius: 28px;
+            transform: rotate(45deg);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #fff;
+            background: var(--lab-route);
+            box-shadow: 0 14px 32px color-mix(in srgb, var(--lab-route) 28%, transparent);
+            transition: background 0.35s, box-shadow 0.35s;
+        }
+
+        .router-core span {
+            transform: rotate(-45deg);
+            font-size: 0.9rem;
+            font-weight: 900;
+            line-height: 1.25;
+        }
+
+        .route-reason {
+            margin-top: 34px;
+            min-height: 42px;
+            color: #475569;
+            font-size: 0.82rem;
+            line-height: 1.5;
+        }
+
+        .routes-panel {
+            display: grid;
+            grid-template-rows: 1fr 1fr;
+            gap: 12px;
+        }
+
+        .route-card {
+            position: relative;
+            overflow: hidden;
+            padding: 14px 16px 12px;
+            opacity: 0.48;
+            transform: scale(0.985);
+            transition: opacity 0.35s, transform 0.35s, border-color 0.35s, box-shadow 0.35s;
+        }
+
+        .route-card::before {
+            content: '';
+            position: absolute;
+            inset: 0 auto 0 0;
+            width: 5px;
+            background: var(--route-color);
+        }
+
+        .route-card.active {
+            opacity: 1;
+            transform: scale(1);
+            border-color: var(--route-color);
+            box-shadow: 0 12px 30px color-mix(in srgb, var(--route-color) 18%, transparent);
+        }
+
+        .route-card.white-route { --route-color: #3b82f6; }
+        .route-card.black-route { --route-color: #10b981; }
+
+        .route-title-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .route-badge {
+            border-radius: 999px;
+            padding: 3px 8px;
+            color: var(--route-color);
+            background: color-mix(in srgb, var(--route-color) 11%, white);
+            font-size: 0.72rem;
+            font-weight: 800;
+        }
+
+        .route-card p {
+            color: var(--text-muted);
+            font-size: 0.78rem;
+            line-height: 1.45;
+        }
+
+        .route-card strong {
+            color: var(--text-main);
+        }
+
+        .route-particle {
+            position: absolute;
+            top: 50%;
+            left: 226px;
+            width: 11px;
+            height: 11px;
+            border-radius: 50%;
+            background: var(--lab-route);
+            box-shadow: 0 0 0 6px color-mix(in srgb, var(--lab-route) 18%, transparent);
+            opacity: 0;
+            z-index: 5;
+            pointer-events: none;
+        }
+
+        .module-lab.routing .route-particle {
+            animation: routeParticle 1.15s cubic-bezier(.22,.8,.22,1) forwards;
+        }
+
+        .module-lab.route-white .route-particle { --particle-y: -78px; }
+        .module-lab.route-black .route-particle { --particle-y: 78px; }
+
+        @keyframes routeParticle {
+            0% { opacity: 0; transform: translate(0, 0) scale(0.6); }
+            18% { opacity: 1; }
+            55% { transform: translate(150px, 0) scale(1); }
+            100% { opacity: 0; transform: translate(410px, var(--particle-y)) scale(0.65); }
+        }
+
+        .lab-status {
+            justify-content: space-between;
+            margin-top: 14px;
+            padding: 10px 14px;
+            border-radius: 10px;
+            background: #f1f5f9;
+            color: #475569;
+            font-size: 0.82rem;
+        }
+
+        .lab-status strong {
+            color: var(--lab-route);
+        }
+
+        /* 数据治理动画 */
+        .governance-flow,
+        .prediction-flow,
+        .diagnosis-flow {
+            display: grid;
+            grid-template-columns: 1fr 70px 1fr;
+            gap: 14px;
+            align-items: center;
+            min-height: 290px;
+        }
+
+        .process-card {
+            min-height: 250px;
+            padding: 14px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .process-svg {
+            width: 100%;
+            height: 190px;
+            display: block;
+        }
+
+        .flow-engine {
+            text-align: center;
+            color: var(--primary-color);
+            font-weight: 900;
+            font-size: 0.78rem;
+        }
+
+        .flow-engine .gear {
+            display: block;
+            margin: 8px auto;
+            font-size: 2rem;
+        }
+
+        .module-lab.playing .gear { animation: gearSpin 1.6s linear 1; }
+        @keyframes gearSpin { to { transform: rotate(360deg); } }
+
+        .draw-path {
+            stroke-dasharray: 560;
+            stroke-dashoffset: 0;
+        }
+
+        .module-lab.playing .draw-path {
+            animation: drawPath 1.7s ease forwards;
+        }
+
+        .module-lab.playing .clean-path { animation-delay: 0.8s; }
+
+        @keyframes drawPath {
+            from { stroke-dashoffset: 560; }
+            to { stroke-dashoffset: 0; }
+        }
+
+        .issue-dot { transform-box: fill-box; transform-origin: center; }
+        .module-lab.playing .issue-dot { animation: issuePulse 0.65s ease-in-out 2; }
+        @keyframes issuePulse { 50% { transform: scale(1.7); opacity: 0.55; } }
+
+        .quality-chip {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            margin-top: 8px;
+            border-radius: 999px;
+            padding: 5px 9px;
+            background: #ecfdf5;
+            color: #047857;
+            font-size: 0.75rem;
+            font-weight: 800;
+        }
+
+        /* 数据治理：可交互的数据质量工作台 */
+        .governance-demo {
+            --governance-accent: #2563eb;
+        }
+
+        .governance-stage {
+            display: grid;
+            grid-template-columns: minmax(0, 1.55fr) minmax(250px, 0.75fr);
+            gap: 14px;
+            align-items: stretch;
+        }
+
+        .governance-plot-card,
+        .governance-report-panel {
+            background: #fff;
+            border: 1px solid var(--border-color);
+            border-radius: 14px;
+            box-shadow: 0 8px 24px rgba(15, 23, 42, 0.06);
+        }
+
+        .governance-plot-card {
+            padding: 13px 14px 10px;
+        }
+
+        .governance-card-head {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 10px;
+            margin-bottom: 2px;
+            color: var(--text-main);
+            font-size: 0.88rem;
+            font-weight: 800;
+        }
+
+        .governance-batch-status {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 4px 8px;
+            border-radius: 999px;
+            background: #eff6ff;
+            color: #1d4ed8;
+            font-size: 0.72rem;
+            transition: background 0.3s ease, color 0.3s ease;
+        }
+
+        .governance-batch-status::before {
+            content: '';
+            width: 7px;
+            height: 7px;
+            border-radius: 50%;
+            background: currentColor;
+        }
+
+        .governance-batch-status.is-processing::before {
+            animation: governanceStatusPulse 1.1s ease-in-out 4;
+        }
+
+        .governance-batch-status.is-complete {
+            background: #ecfdf5;
+            color: #047857;
+        }
+
+        @keyframes governanceStatusPulse {
+            50% { transform: scale(1.55); opacity: 0.45; }
+        }
+
+        .modal-visual .governance-chart {
+            display: block;
+            width: 100%;
+            height: 235px;
+            max-height: none;
+        }
+
+        .governance-series {
+            fill: none;
+            stroke-linecap: round;
+            stroke-linejoin: round;
+        }
+
+        .governance-output-series {
+            stroke-dasharray: 900;
+            stroke-dashoffset: 0;
+        }
+
+        .governance-running .governance-output-series {
+            animation: governanceDraw 1.9s 2s ease both;
+        }
+
+        @keyframes governanceDraw {
+            from { stroke-dashoffset: 900; }
+            to { stroke-dashoffset: 0; }
+        }
+
+        .governance-physical-band {
+            transform-box: fill-box;
+            transform-origin: center;
+        }
+
+        .governance-running .governance-physical-band {
+            animation: governanceBand 1.1s 0.65s ease both;
+        }
+
+        @keyframes governanceBand {
+            from { opacity: 0; transform: translateY(5px) scaleY(0.88); }
+            to { opacity: 1; transform: translateY(0) scaleY(1); }
+        }
+
+        .governance-scan {
+            opacity: 0;
+        }
+
+        .governance-running .governance-scan {
+            animation: governanceScan 2.8s 0.85s ease-in-out both;
+        }
+
+        @keyframes governanceScan {
+            0% { opacity: 0; transform: translateX(0); }
+            12%, 88% { opacity: 1; }
+            100% { opacity: 0; transform: translateX(438px); }
+        }
+
+        .governance-anomaly {
+            transform-box: fill-box;
+            transform-origin: center;
+        }
+
+        .governance-running .governance-anomaly {
+            animation: governanceFlag 0.75s 1.85s ease 2 alternate;
+        }
+
+        @keyframes governanceFlag {
+            to { transform: scale(1.45); opacity: 0.55; }
+        }
+
+        .governance-legend {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 14px;
+            color: #64748b;
+            font-size: 0.72rem;
+            font-weight: 700;
+        }
+
+        .governance-legend span {
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .governance-swatch {
+            width: 18px;
+            height: 3px;
+            border-radius: 999px;
+            background: currentColor;
+        }
+
+        .governance-report-panel {
+            padding: 13px;
+        }
+
+        .governance-report-panel h4 {
+            margin-bottom: 9px;
+            font-size: 0.92rem;
+        }
+
+        .governance-step-list {
+            display: grid;
+            gap: 6px;
+        }
+
+        .governance-step {
+            display: grid;
+            grid-template-columns: 24px 1fr;
+            gap: 8px;
+            align-items: center;
+            padding: 7px 8px;
+            border-radius: 8px;
+            background: #f8fafc;
+            color: #64748b;
+            font-size: 0.75rem;
+            font-weight: 700;
+        }
+
+        .governance-step b {
+            display: grid;
+            place-items: center;
+            width: 22px;
+            height: 22px;
+            border-radius: 50%;
+            background: #e2e8f0;
+            color: #475569;
+        }
+
+        .governance-running .governance-step {
+            animation: governanceStep 0.6s ease both;
+        }
+
+        .governance-running .governance-step:nth-child(2) { animation-delay: 0.9s; }
+        .governance-running .governance-step:nth-child(3) { animation-delay: 1.8s; }
+        .governance-running .governance-step:nth-child(4) { animation-delay: 2.8s; }
+
+        @keyframes governanceStep {
+            to { background: #ecfdf5; color: #065f46; transform: translateX(3px); }
+        }
+
+        .governance-running .governance-evidence {
+            animation: governanceReveal 0.65s 1.2s ease both;
+        }
+
+        .governance-running .governance-report-grid {
+            animation: governanceReveal 0.7s 3.35s ease both;
+        }
+
+        @keyframes governanceReveal {
+            from { opacity: 0; transform: translateY(8px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .governance-evidence {
+            margin-top: 10px;
+            padding: 8px 9px;
+            border-left: 4px solid var(--governance-accent);
+            background: #eff6ff;
+            color: #475569;
+            font-size: 0.74rem;
+            line-height: 1.45;
+        }
+
+        .governance-evidence strong {
+            color: var(--text-main);
+        }
+
+        .governance-report-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 7px;
+            margin-top: 9px;
+        }
+
+        .governance-report-item {
+            padding: 7px 8px;
+            border-radius: 8px;
+            background: #f8fafc;
+            color: #64748b;
+            font-size: 0.69rem;
+        }
+
+        .governance-report-item strong {
+            display: block;
+            margin-top: 2px;
+            color: var(--text-main);
+            font-size: 0.88rem;
+        }
+
+        .feedback-module-flow {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 12px;
+            margin-top: 18px;
+        }
+
+        .feedback-stage-card {
+            position: relative;
+            padding: 18px 12px;
+            border-top: 4px solid #f59e0b;
+            border-radius: 10px;
+            background: #fff;
+            box-shadow: 0 8px 20px rgba(15, 23, 42, 0.06);
+            color: #475569;
+            text-align: center;
+            font-size: 0.78rem;
+            line-height: 1.5;
+        }
+
+        .feedback-stage-card strong {
+            display: block;
+            margin-bottom: 5px;
+            color: var(--text-main);
+            font-size: 0.9rem;
+        }
+
+        .feedback-stage-card:not(:last-child)::after {
+            content: '→';
+            position: absolute;
+            right: -18px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #b45309;
+            font-size: 1.2rem;
+            font-weight: 900;
+            z-index: 2;
+        }
+
+        .feedback-running .feedback-stage-card {
+            animation: feedbackStageIn 0.45s ease both;
+        }
+
+        .feedback-running .feedback-stage-card:nth-child(2) { animation-delay: 0.18s; }
+        .feedback-running .feedback-stage-card:nth-child(3) { animation-delay: 0.36s; }
+        .feedback-running .feedback-stage-card:nth-child(4) { animation-delay: 0.54s; }
+
+        @keyframes feedbackStageIn {
+            from { opacity: 0; transform: translateX(-8px); }
+            to { opacity: 1; transform: translateX(0); }
+        }
+
+        /* 预测动画 */
+        .prediction-flow {
+            grid-template-columns: 180px 70px 1fr;
+        }
+
+        .strategy-stack {
+            display: grid;
+            gap: 9px;
+            margin-top: 16px;
+        }
+
+        .strategy-step {
+            padding: 9px 10px;
+            border-left: 4px solid #cbd5e1;
+            background: #f8fafc;
+            color: #64748b;
+            font-size: 0.78rem;
+            font-weight: 700;
+            transition: 0.3s;
+        }
+
+        .module-lab.playing .strategy-step:nth-child(1) { animation: stepActive 0.55s 0s both; }
+        .module-lab.playing .strategy-step:nth-child(2) { animation: stepActive 0.55s 0.55s both; }
+        .module-lab.playing .strategy-step:nth-child(3) { animation: stepActive 0.55s 1.1s both; }
+        @keyframes stepActive {
+            to { border-left-color: var(--primary-color); color: var(--text-main); background: #fdf2f8; transform: translateX(5px); }
+        }
+
+        .confidence-band { opacity: 1; }
+        .module-lab.playing .confidence-band { animation: bandReveal 1s 1.15s both; }
+        @keyframes bandReveal { from { opacity: 0; } to { opacity: 1; } }
+
+        .scan-line { opacity: 0; }
+        .module-lab.playing .scan-line { animation: scanMove 2s 0.4s ease-in-out both; }
+        @keyframes scanMove {
+            0% { opacity: 0; transform: translateX(0); }
+            15% { opacity: 1; }
+            85% { opacity: 1; }
+            100% { opacity: 0; transform: translateX(310px); }
+        }
+
+        /* 预测 Agent：多模型专家池与动态集成（合并自项目组实现） */
+        .forecast-demo {
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            color: var(--text-main);
+            font-size: 0.92rem;
+        }
+
+        .forecast-model-grid {
+            display: grid;
+            grid-template-columns: repeat(4, minmax(0, 1fr));
+            gap: 10px;
+        }
+
+        .forecast-model-card {
+            border: 1px solid #dbe3ef;
+            background: #ffffff;
+            border-radius: 8px;
+            padding: 10px;
+            cursor: pointer;
+            transition: 0.2s;
+        }
+
+        .forecast-model-card.active {
+            border-color: var(--primary-color);
+            box-shadow: 0 8px 18px rgba(138, 28, 82, 0.14);
+            background: #fdf2f8;
+        }
+
+        .forecast-model-title {
+            font-weight: 800;
+            color: var(--primary-color);
+            margin-bottom: 4px;
+        }
+
+        .forecast-model-desc {
+            color: var(--text-muted);
+            line-height: 1.35;
+            min-height: 38px;
+        }
+
+        .forecast-weight-row {
+            display: grid;
+            grid-template-columns: 42px 1fr 38px;
+            align-items: center;
+            gap: 8px;
+            margin-top: 8px;
+        }
+
+        .forecast-weight-row label {
+            color: #475569;
+            font-weight: 700;
+        }
+
+        .forecast-weight-row input {
+            width: 100%;
+            accent-color: var(--primary-color);
+        }
+
+        .forecast-chart-wrap {
+            position: relative;
+            flex: 1;
+            min-height: 208px;
+            border: 1px solid #dbe3ef;
+            border-radius: 8px;
+            background: #ffffff;
+            padding: 10px 12px;
+        }
+
+        .forecast-chart-head {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 4px;
+            color: #475569;
+            font-weight: 700;
+        }
+
+        .forecast-chart-title {
+            color: var(--text-main);
+        }
+
+        .forecast-chart-hint {
+            font-size: 0.78rem;
+            color: var(--text-muted);
+            font-weight: 600;
+        }
+
+        .modal-visual .forecast-chart {
+            width: 100%;
+            height: 198px;
+            max-height: none;
+            display: block;
+        }
+
+        .forecast-legend {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-top: 4px;
+        }
+
+        .forecast-legend button {
+            border: 1px solid #dbe3ef;
+            background: #f8fafc;
+            border-radius: 999px;
+            padding: 4px 10px;
+            color: #475569;
+            font-weight: 700;
+            cursor: pointer;
+        }
+
+        .forecast-legend button.active {
+            color: var(--primary-color);
+            border-color: var(--primary-color);
+            background: #fdf2f8;
+        }
+
+        /* 解释诊断动画 */
+        .diagnosis-flow {
+            grid-template-columns: 1fr 260px;
+        }
+
+        .diagnose-summary {
+            padding: 16px;
+        }
+
+        .cause-row {
+            display: grid;
+            grid-template-columns: 72px 1fr 42px;
+            gap: 8px;
+            align-items: center;
+            margin: 11px 0;
+            color: #475569;
+            font-size: 0.78rem;
+        }
+
+        .cause-track {
+            height: 10px;
+            border-radius: 999px;
+            background: #e2e8f0;
+            overflow: hidden;
+        }
+
+        .cause-fill {
+            height: 100%;
+            width: var(--cause-width);
+            border-radius: inherit;
+            background: var(--cause-color);
+            transform-origin: left;
+        }
+
+        .module-lab.playing .cause-fill { animation: growBar 0.7s ease both; }
+        .module-lab.playing .cause-row:nth-child(3) .cause-fill { animation-delay: 0.18s; }
+        .module-lab.playing .cause-row:nth-child(4) .cause-fill { animation-delay: 0.36s; }
+        @keyframes growBar { from { transform: scaleX(0); } to { transform: scaleX(1); } }
+
+        .feedback-callout {
+            margin-top: 18px;
+            border-left: 4px solid var(--primary-color);
+            background: #fdf2f8;
+            padding: 11px 12px;
+            color: #475569;
+            font-size: 0.8rem;
+            line-height: 1.5;
+        }
+
+        .module-lab.playing .feedback-callout { animation: feedbackIn 0.55s 1s both; }
+        @keyframes feedbackIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+
+        .diagnosis-series {
+            fill: none;
+            stroke-linecap: round;
+            stroke-linejoin: round;
+        }
+
+        .event-annotation {
+            transform-box: fill-box;
+            transform-origin: center;
+        }
+
+        .module-lab.playing .event-annotation {
+            animation: annotationPop 0.5s 0.35s ease both;
+        }
+
+        @keyframes annotationPop {
+            from { opacity: 0; transform: translateY(-5px) scale(0.97); }
+            to { opacity: 1; transform: translateY(0) scale(1); }
+        }
+
+        @media (max-width: 820px) {
+            .automl-stage,
+            .governance-flow,
+            .prediction-flow,
+            .diagnosis-flow {
+                grid-template-columns: 1fr;
+            }
+            .governance-stage { grid-template-columns: 1fr; }
+            .feedback-module-flow { grid-template-columns: repeat(2, 1fr); }
+            .feedback-stage-card::after { display: none; }
+            .routes-panel { grid-template-columns: 1fr 1fr; grid-template-rows: none; }
+            .forecast-model-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+            .forecast-chart-head { align-items: flex-start; flex-direction: column; }
+            .route-particle { display: none; }
+            .modal-content { padding: 20px; }
+            .modal-visual { min-height: 0; }
+        }
+
+        @media (max-width: 520px) {
+            .forecast-model-grid { grid-template-columns: 1fr; }
+            .feedback-module-flow { grid-template-columns: 1fr; }
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+            .module-lab *, .module-lab *::before, .module-lab *::after {
+                animation-duration: 0.01ms !important;
+                animation-delay: 0ms !important;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- 视图 1：首页 (系统总览) -->
+    <div class="view-container active" id="view-home">
+        <div class="header">
+            <h1>万象Agentic AutoML 全维智控体系架构</h1>
+        </div>
+
+        <!-- 双入口导航 -->
+        <div class="top-entries">
+            <div class="entry-pill" onclick="openModule('automl')">查看各模块功能介绍</div>
+            <div class="entry-pill" onclick="scrollToScenarios()">典型业务场景演示</div>
+        </div>
+
+        <!-- 高保真系统框图区 -->
+        <div class="canvas-wrapper">
+            <div class="canvas">
+
+                <!-- 左侧：输入 -->
+                <div class="side-panel" id="panel-input">
+                    <div class="side-title">输入</div>
+                    <div class="side-item">
+                        <div class="side-icon">📈</div>
+                        <div class="side-text">时序数据</div>
+                    </div>
+                    <div class="side-item">
+                        <div class="side-icon">🌦️</div>
+                        <div class="side-text">外生变量</div>
+                    </div>
+                    <div class="side-item" style="margin-bottom: 0;">
+                        <div class="icon-p">P</div>
+                        <div class="side-text">任务目标</div>
+                    </div>
+                </div>
+
+                <div class="loop-border">
+                    <div class="loop-tag">智能体闭环</div>
+                </div>
+
+                <!-- 节点 1：数据治理 (可点击) -->
+                <div class="node" id="node-data" onclick="openModule('data')">
+                    <div class="node-title">🤖 数据治理 Agent</div>
+                    <div class="node-desc">清洗异常数据<br>输出质量报告</div>
+                </div>
+
+                <!-- 节点 2：AutoML (可点击) -->
+                <div class="node" id="node-automl" onclick="openModule('automl')">
+                    <div class="node-title">🤖 「Agentic AutoML」核心决策引擎</div>
+                    <div class="node-desc" style="margin-bottom:10px;">匹配场站条件，自动生成适用的预测方案</div>
+
+                    <div class="sandbox-env">
+                        <div class="sandbox-title">Sandbox Environment</div>
+                        <div class="automl-inner">
+                            <div class="sub-box" style="border-color: #3b82f6; background: #eff6ff;">
+                                <h4 style="color: #3b82f6;">「白盒」</h4>
+                                <h4 style="color: #1e293b; font-size: 1rem;">机理驱动的泛化专家</h4>
+                                <div class="sub-box-desc">小样本/新场站<br>透明解释 | 稳定基线</div>
+                            </div>
+                            <div class="sub-box" style="border-color: #10b981; background: #ecfdf5;">
+                                <h4 style="color: #10b981;">「黑盒」</h4>
+                                <h4 style="color: #1e293b; font-size: 1rem;">数据驱动的拟合大师</h4>
+                                <div class="sub-box-desc">成熟场站/复杂工况<br>非线性模式 | 精度提升</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="automl-footer">自动生成预测方案 | 记录执行结果 | 支持持续优化</div>
+                </div>
+
+                <!-- 节点 3：预测 Agent (可点击) -->
+                <div class="node" id="node-predict" onclick="openModule('predict')">
+                    <div class="node-title">🤖 预测 Agent</div>
+                    <div class="node-desc">生成出力预测<br>支撑调度决策</div>
+                </div>
+
+                <!-- 节点 4：解释诊断 Agent (可点击) -->
+                <div class="node" id="node-diagnose" onclick="openModule('diagnose')">
+                    <div class="node-title">🤖 解释诊断 Agent</div>
+                    <div class="node-desc">定位偏差来源<br>推动持续改进</div>
+                </div>
+
+                <!-- 节点 5：闭环反馈 (可点击) -->
+                <div class="node" id="node-feedback" onclick="openModule('feedback')">
+                    <div class="node-title">🔄 闭环反馈：真实出力回流 ➔ 问题定位 ➔ 规划调整 ➔ 效果验证</div>
+                </div>
+
+                <!-- 右侧：输出 -->
+                <div class="side-panel" id="panel-output">
+                    <div class="side-title">输出</div>
+                    <div class="side-item">
+                        <div class="side-icon">📉</div>
+                        <div class="side-text">预测结果</div>
+                    </div>
+                    <div class="side-item" style="margin-bottom: 0;">
+                        <div class="side-icon">📄</div>
+                        <div class="side-text">总结文档</div>
+                    </div>
+                </div>
+
+                <!-- 连接线 -->
+                <div class="connector" id="line0"></div>
+                <div class="connector" id="line1"></div>
+                <div class="connector" id="line2"></div>
+                <div class="connector" id="line3"></div>
+                <div class="connector" id="line-out1"></div>
+                <div class="connector" id="line-out2"></div>
+                <div class="connector" id="line4"></div>
+                <div class="connector" id="line5"></div>
+            </div>
+        </div> <!-- End of canvas-wrapper -->
+
+        <!-- 场景入口区 -->
+        <div class="scenario-entry" id="scenario-section">
+            <div class="entry-title">典型业务场景演示</div>
+            <div class="cards-wrapper">
+                <div class="card" onclick="openScenario('s1')">
+                    <div class="card-icon">☀️</div>
+                    <div class="card-title">场景一：新建光伏小样本</div>
+                    <div class="card-desc">数据稀缺冷启动<br>白盒物理推演</div>
+                </div>
+                <div class="card" onclick="openScenario('s2')">
+                    <div class="card-icon">🌪️</div>
+                    <div class="card-title">场景二：成熟风电大数据</div>
+                    <div class="card-desc">海量复杂非线性<br>黑盒多智能体博弈</div>
+                </div>
+                <div class="card" onclick="openScenario('s3')">
+                    <div class="card-icon">🌦️</div>
+                    <div class="card-title">场景三：气象信息对预测性能提升</div>
+                    <div class="card-desc">气象环境突变<br>微气象特征深度介入</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 视图 2：场景详情页 -->
+    <div class="view-container" id="view-scenario">
+        <div class="scenario-header">
+            <h2 id="scen-title">加载中...</h2>
+            <div class="scenario-context" id="scen-context">加载中...</div>
+        </div>
+
+        <!-- 视频播放区：openScenario 会动态写入 <video> -->
+        <div class="video-wrapper" id="video-wrapper">
+            <div id="video-slot" style="width:100%;height:100%;display:flex;align-items:center;justify-content:center;color:#cbd5e1;font-size:1.1rem;">
+                预制录屏视频播放区
+            </div>
+        </div>
+
+        <!-- 业务价值提炼 -->
+        <div class="value-statement">
+            <p id="scen-value">加载中...</p>
+        </div>
+
+        <div class="btn-return-home" onclick="goHome()">返回系统总览</div>
+    </div>
+
+    <!-- 模块详情弹窗 (Overlay) -->
+    <div class="modal-overlay" id="module-modal">
+        <div class="modal-content">
+            <div class="modal-header" id="mod-title">模块名称</div>
+            <div class="modal-biz-value" id="mod-value">业务价值说明...</div>
+            <div class="modal-visual" id="mod-visual">
+                [ 静态示意图 / 动画展示区 ]
+            </div>
+            <button class="btn-return-modal" onclick="closeModule()">返回系统总览</button>
+        </div>
+    </div>
+
+    <!-- 交互脚本 -->
+    <script>
+        // 模块弹窗业务数据
+        const modulesData = {
+            'data': {
+                title: "数据治理 Agent",
+                value: "本模块自动清洗海量杂乱时序数据，并依据外生变量通过物理规律进行异常值检测，输出清洗后的数据集和数据质量报告。解决新能源设备数据质量差、可用性低的难题。",
+                visual: renderDataLab
+            },
+            'automl': {
+                title: "AutoML 核心决策引擎",
+                value: "本模块根据场站的数据条件和预测任务，自动生成适用的预测方案。解决不同场站数据基础差异大、人工选择方案耗时、预测能力难以快速落地的问题。",
+                visual: renderAutoMLLab
+            },
+            'predict': {
+                title: "预测 Agent",
+                value: "本模块接收治理后的数据和已确定的预测方案，自动生成新能源出力预测结果及其可信范围。解决预测流程依赖人工操作、结果口径不一致、调度人员难以及时获得可信预测的问题。",
+                visual: createPredictionAgentDemo
+            },
+            'diagnose': {
+                title: "解释诊断 Agent",
+                value: "本模块在实际出力数据回流后，结合训练日志和预测日志，对预测偏差进行归因并给出改进建议。解决预测效果下降时原因难定位、问题处理依赖人工经验、系统无法持续优化的问题。",
+                visual: renderDiagnosisLab
+            },
+            'feedback': {
+                title: "闭环反馈",
+                value: "本模块持续接收实际出力和运行结果，形成问题回流、任务调整和效果验证闭环。解决模型上线后缺少持续跟踪、问题修复不及时、预测能力难以长期保持的问题。",
+                visual: renderFeedbackLab
+            }
+        };
+
+        // 场景业务数据
+        const scenariosData = {
+            's1': {
+                title: "场景一：新建光伏电站 · 小样本冷启动",
+                context: "工况难题：新建电站并网初期，历史数据极度稀缺。传统纯数据驱动模型如同“无米之炊”，极易产生过拟合，导致预测结果严重失真。",
+                value: "在新建场站冷启动场景下，本系统强制路由至“白盒路线”，通过物理机理弥补数据短板，有效保障预测稳健性，强力支撑电网安全调度。",
+                video: "scene/scene1.mp4"
+            },
+            's2': {
+                title: "场景二：成熟风电场 · 海量数据黑盒预测",
+                context: "工况难题：成熟风电场积累了海量高频运行数据，风况复杂且呈现高度非线性。普通物理公式难以捕捉其深层规律，造成数据资产浪费。",
+                value: "面对海量复杂非线性数据，系统智能分流至“黑盒路线”，凭借多智能体博弈与自适应集成，充分释放数据红利，极致提升出力预测精度。",
+                video: "scene/scene2.mp4"
+            },
+            's3': {
+                title: "场景三：气象信息对预测性能提升",
+                context: "工况难题：突发的积云遮挡或微气象剧变常导致新能源出力断崖式波动。纯数据驱动黑盒模型往往反应迟钝，导致预测准度大幅跳水与安全隐患。",
+                value: "当在线监测到极端气象扰动时，系统触发干预机制，深度融合领域物理先验知识修正黑盒外推，显著增强系统在极端工况下的抗扰动能力与可靠性。",
+                video: "scene/scene3.mp4"
+            }
+        };
+
+        // 弹窗控制逻辑
+        function openModule(modId) {
+            const data = modulesData[modId];
+            document.getElementById('mod-title').innerText = data.title;
+            document.getElementById('mod-value').innerText = data.value;
+            document.getElementById('mod-visual').innerHTML = data.visual();
+            document.getElementById('module-modal').classList.add('active');
+            requestAnimationFrame(function () { initModuleLab(modId); });
+        }
+        function closeModule() {
+            document.getElementById('module-modal').classList.remove('active');
+        }
+
+        // 滚动到场景入口区
+        function scrollToScenarios() {
+            document.getElementById('scenario-section').scrollIntoView({ behavior: 'smooth' });
+        }
+
+        // 场景页面切换逻辑
+        function openScenario(scenId) {
+            const data = scenariosData[scenId];
+            document.getElementById('scen-title').innerText = data.title;
+            document.getElementById('scen-context').innerText = data.context;
+
+            // 针对不同的场景配置强调色
+            let borderColor = "#3b82f6"; // 默认蓝
+            if (scenId === 's1') borderColor = "#f59e0b"; // 场景一：黄
+            if (scenId === 's2') borderColor = "#10b981"; // 场景二：绿
+            if (scenId === 's3') borderColor = "#8a1c52"; // 场景三：紫红
+            document.querySelector('.value-statement').style.borderLeftColor = borderColor;
+
+            document.getElementById('scen-value').innerText = data.value;
+
+            // 动态加载视频
+            const slot = document.getElementById('video-slot');
+            if (data.video) {
+                slot.innerHTML = '<video src="' + data.video + '" controls autoplay muted playsinline ' +
+                    'style="width:100%;height:100%;object-fit:contain;background:#000;" ' +
+                    'preload="auto"></video>';
+            } else {
+                slot.innerHTML = '<div style="text-align:center;color:#cbd5e1;font-size:1.1rem;">' +
+                    '【 预制录屏视频播放区 】<br><br>该场景视频待补充</div>';
+            }
+
+            // 切换视图并回滚顶部
+            document.getElementById('view-home').classList.remove('active');
+            window.scrollTo(0, 0);
+            document.getElementById('view-scenario').classList.add('active');
+        }
+
+        function goHome() {
+            document.getElementById('view-scenario').classList.remove('active');
+            window.scrollTo(0, 0);
+            document.getElementById('view-home').classList.add('active');
+        }
+
+        /* ========================================================
+           四大核心模块：交互动画实验台
+           ======================================================== */
+
+        function initModuleLab(modId) {
+            if (modId === 'data') initDataLab();
+            if (modId === 'automl') initAutoMLLab();
+            if (modId === 'predict') initPredictionAgentDemo(document.getElementById('mod-visual'));
+            if (modId === 'diagnose') initDiagnosisLab();
+            if (modId === 'feedback') replayLab(document.getElementById('feedback-lab'), 'feedback-running');
+        }
+
+        function replayLab(root, className) {
+            const animationClass = className || 'playing';
+            root.classList.remove(animationClass);
+            void root.offsetWidth;
+            root.classList.add(animationClass);
+        }
+
+        function renderDataLab() {
+            return [
+                '<div class="module-lab governance-demo" id="data-lab">',
+                '  <div class="lab-toolbar">',
+                '    <div><div class="lab-kicker">Data Quality Console</div><strong>选择数据批次，查看从原始数据到可信数据资产的治理过程</strong></div>',
+                '    <div class="lab-presets" role="group" aria-label="数据批次">',
+                '      <button class="lab-preset active" type="button" data-governance-case="pv">光伏场站 · 批次 A</button>',
+                '      <button class="lab-preset" type="button" data-governance-case="wind">风电场站 · 批次 B</button>',
+                '    </div>',
+                '  </div>',
+                '  <div class="governance-stage">',
+                '    <section class="governance-plot-card">',
+                '      <div class="governance-card-head"><span data-role="governance-batch">光伏场站 · 批次 A</span><span class="governance-batch-status is-processing" data-role="governance-status" aria-live="polite">正在生成可信数据集</span></div>',
+                '      <svg class="governance-chart" data-role="governance-chart" viewBox="0 0 540 245" role="img" aria-label="光伏场站原始数据经过物理一致性检测后生成清洗数据">',
+                '        <g stroke="#e2e8f0" stroke-width="1"><line x1="36" y1="35" x2="36" y2="205"/><line x1="36" y1="205" x2="510" y2="205"/><line x1="36" y1="65" x2="510" y2="65"/><line x1="36" y1="110" x2="510" y2="110"/><line x1="36" y1="155" x2="510" y2="155"/></g>',
+                '        <g class="governance-physical-band" data-role="physical-band">',
+                '          <path data-role="physical-band-path" d="M40 181 L70 169 L100 145 L130 113 L160 87 L190 75 L220 71 L250 79 L280 91 L310 101 L340 97 L370 91 L400 105 L430 131 L460 157 L490 177 L490 159 L460 139 L430 113 L400 87 L370 73 L340 79 L310 83 L280 73 L250 61 L220 53 L190 57 L160 69 L130 95 L100 127 L70 151 L40 163 Z" fill="#dbeafe" opacity="0.48"/>',
+                '          <polyline class="governance-series" data-role="expected-series" points="40,172 70,160 100,136 130,104 160,78 190,66 220,62 250,70 280,82 310,92 340,88 370,82 400,96 430,122 460,148 490,168" stroke="#3b82f6" stroke-width="2" stroke-dasharray="5 4"/>',
+                '        </g>',
+                '        <polyline class="governance-series" data-role="raw-series" points="40,170 70,158 100,130 130,96 160,58 190,82 220,36 250,92 280,78 310,118 340,86 370,102 400,68 430,124 460,145 490,166" stroke="#db2777" stroke-width="2.5" opacity="0.82"/>',
+                '        <polyline class="governance-series governance-output-series" data-role="clean-series" points="40,172 70,160 100,136 130,104 160,78 190,66 220,62 250,70 280,82 310,92 340,88 370,82 400,96 430,122 460,148 490,168" stroke="#10b981" stroke-width="4"/>',
+                '        <g data-role="governance-anomalies"><circle class="governance-anomaly" cx="160" cy="58" r="7" fill="#fff" stroke="#ef4444" stroke-width="2.5"/><circle class="governance-anomaly" cx="220" cy="36" r="7" fill="#fff" stroke="#ef4444" stroke-width="2.5"/><circle class="governance-anomaly" cx="310" cy="118" r="7" fill="#fff" stroke="#ef4444" stroke-width="2.5"/><circle class="governance-anomaly" cx="400" cy="68" r="7" fill="#fff" stroke="#ef4444" stroke-width="2.5"/></g>',
+                '        <line class="governance-scan" x1="45" y1="35" x2="45" y2="204" stroke="#8a1c52" stroke-width="2"/>',
+                '        <g fill="#64748b" font-size="10"><text x="18" y="40">高</text><text x="18" y="205">低</text><text x="510" y="224" text-anchor="end">时间</text></g>',
+                '      </svg>',
+                '      <div class="governance-legend">',
+                '        <span style="color:#db2777"><i class="governance-swatch"></i>原始时序</span>',
+                '        <span style="color:#3b82f6"><i class="governance-swatch"></i>物理期望区间</span>',
+                '        <span style="color:#10b981"><i class="governance-swatch"></i>清洗后数据</span>',
+                '        <span style="color:#ef4444">○ 异常点</span>',
+                '      </div>',
+                '    </section>',
+                '    <aside class="governance-report-panel">',
+                '      <h4>治理任务执行记录</h4>',
+                '      <div class="governance-step-list">',
+                '        <div class="governance-step"><b>1</b><span>接入并对齐原始时序</span></div>',
+                '        <div class="governance-step"><b>2</b><span>关联可用外生变量</span></div>',
+                '        <div class="governance-step"><b>3</b><span>依据物理规律识别异常</span></div>',
+                '        <div class="governance-step"><b>4</b><span>输出数据集与质量报告</span></div>',
+                '      </div>',
+                '      <div class="governance-evidence"><strong>物理校验依据</strong><br><span data-role="governance-evidence">辐照度、组件温度与光伏出力响应关系</span></div>',
+                '      <div class="governance-report-grid">',
+                '        <div class="governance-report-item">异常值<strong data-role="anomaly-count">7 个</strong></div>',
+                '        <div class="governance-report-item">缺失点<strong data-role="missing-count">12 个</strong></div>',
+                '        <div class="governance-report-item">完整率<strong data-role="completeness">99.6%</strong></div>',
+                '        <div class="governance-report-item">质量等级<strong data-role="quality-level">A</strong></div>',
+                '      </div>',
+                '    </aside>',
+                '  </div>',
+                '  <div class="lab-status"><span>输出：清洗后的统一数据集 + 数据质量报告</span><strong data-role="governance-result">治理完成，可用于后续预测</strong></div>',
+                '</div>'
+            ].join('');
+        }
+
+        function initDataLab() {
+            const root = document.getElementById('data-lab');
+            const cases = {
+                pv: {
+                    batch: '光伏场站 · 批次 A',
+                    label: '光伏场站原始数据经过辐照度和组件温度的物理一致性检测后生成清洗数据',
+                    raw: '40,170 70,158 100,130 130,96 160,58 190,82 220,36 250,92 280,78 310,118 340,86 370,102 400,68 430,124 460,145 490,166',
+                    expected: '40,172 70,160 100,136 130,104 160,78 190,66 220,62 250,70 280,82 310,92 340,88 370,82 400,96 430,122 460,148 490,168',
+                    clean: '40,172 70,160 100,136 130,104 160,78 190,66 220,62 250,70 280,82 310,92 340,88 370,82 400,96 430,122 460,148 490,168',
+                    band: 'M40 181 L70 169 L100 145 L130 113 L160 87 L190 75 L220 71 L250 79 L280 91 L310 101 L340 97 L370 91 L400 105 L430 131 L460 157 L490 177 L490 159 L460 139 L430 113 L400 87 L370 73 L340 79 L310 83 L280 73 L250 61 L220 53 L190 57 L160 69 L130 95 L100 127 L70 151 L40 163 Z',
+                    anomalies: '<circle class="governance-anomaly" cx="160" cy="58" r="7" fill="#fff" stroke="#ef4444" stroke-width="2.5"/><circle class="governance-anomaly" cx="220" cy="36" r="7" fill="#fff" stroke="#ef4444" stroke-width="2.5"/><circle class="governance-anomaly" cx="310" cy="118" r="7" fill="#fff" stroke="#ef4444" stroke-width="2.5"/><circle class="governance-anomaly" cx="400" cy="68" r="7" fill="#fff" stroke="#ef4444" stroke-width="2.5"/>',
+                    evidence: '辐照度、组件温度与光伏出力响应关系',
+                    anomalyCount: '7 个',
+                    missingCount: '12 个',
+                    completeness: '99.6%',
+                    quality: 'A',
+                    result: '治理完成，可用于后续预测'
+                },
+                wind: {
+                    batch: '风电场站 · 批次 B',
+                    label: '风电场站原始数据经过风速、风向和机组出力规律检测后生成清洗数据',
+                    raw: '40,178 70,166 100,142 130,154 160,112 190,86 220,128 250,54 280,90 310,48 340,116 370,76 400,64 430,92 460,58 490,82',
+                    expected: '40,180 70,168 100,150 130,138 160,120 190,102 220,92 250,84 280,76 310,70 340,74 370,68 400,72 430,78 460,70 490,76',
+                    clean: '40,180 70,168 100,150 130,138 160,120 190,102 220,92 250,84 280,76 310,70 340,74 370,68 400,72 430,78 460,70 490,76',
+                    band: 'M40 189 L70 177 L100 159 L130 147 L160 129 L190 111 L220 101 L250 93 L280 85 L310 79 L340 83 L370 77 L400 81 L430 87 L460 79 L490 85 L490 67 L460 61 L430 69 L400 63 L370 59 L340 65 L310 61 L280 67 L250 75 L220 83 L190 93 L160 111 L130 129 L100 141 L70 159 L40 171 Z',
+                    anomalies: '<circle class="governance-anomaly" cx="130" cy="154" r="7" fill="#fff" stroke="#ef4444" stroke-width="2.5"/><circle class="governance-anomaly" cx="220" cy="128" r="7" fill="#fff" stroke="#ef4444" stroke-width="2.5"/><circle class="governance-anomaly" cx="250" cy="54" r="7" fill="#fff" stroke="#ef4444" stroke-width="2.5"/><circle class="governance-anomaly" cx="310" cy="48" r="7" fill="#fff" stroke="#ef4444" stroke-width="2.5"/><circle class="governance-anomaly" cx="340" cy="116" r="7" fill="#fff" stroke="#ef4444" stroke-width="2.5"/>',
+                    evidence: '风速、风向与机组功率曲线的物理一致性',
+                    anomalyCount: '11 个',
+                    missingCount: '6 个',
+                    completeness: '99.2%',
+                    quality: 'B+',
+                    result: '治理完成，建议关注风速传感器'
+                }
+            };
+
+            function showCase(name, animate) {
+                const item = cases[name];
+                const status = root.querySelector('[data-role="governance-status"]');
+                const result = root.querySelector('[data-role="governance-result"]');
+
+                if (root._governanceCompletionTimer) {
+                    clearTimeout(root._governanceCompletionTimer);
+                }
+                status.classList.remove('is-complete');
+                status.classList.add('is-processing');
+                status.textContent = '正在生成可信数据集';
+                result.textContent = '正在检测异常并生成质量报告';
+
+                root.querySelectorAll('[data-governance-case]').forEach(function (button) {
+                    button.classList.toggle('active', button.dataset.governanceCase === name);
+                });
+                root.querySelector('[data-role="governance-batch"]').textContent = item.batch;
+                root.querySelector('[data-role="governance-chart"]').setAttribute('aria-label', item.label);
+                root.querySelector('[data-role="raw-series"]').setAttribute('points', item.raw);
+                root.querySelector('[data-role="expected-series"]').setAttribute('points', item.expected);
+                root.querySelector('[data-role="clean-series"]').setAttribute('points', item.clean);
+                root.querySelector('[data-role="physical-band-path"]').setAttribute('d', item.band);
+                root.querySelector('[data-role="governance-anomalies"]').innerHTML = item.anomalies;
+                root.querySelector('[data-role="governance-evidence"]').textContent = item.evidence;
+                root.querySelector('[data-role="anomaly-count"]').textContent = item.anomalyCount;
+                root.querySelector('[data-role="missing-count"]').textContent = item.missingCount;
+                root.querySelector('[data-role="completeness"]').textContent = item.completeness;
+                root.querySelector('[data-role="quality-level"]').textContent = item.quality;
+                if (animate !== false) replayLab(root, 'governance-running');
+
+                function finishGovernance() {
+                    status.classList.remove('is-processing');
+                    status.classList.add('is-complete');
+                    status.textContent = '可信数据集治理完毕';
+                    result.textContent = item.result;
+                }
+
+                const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+                if (animate === false || reduceMotion) {
+                    finishGovernance();
+                } else {
+                    root._governanceCompletionTimer = setTimeout(finishGovernance, 4400);
+                }
+            }
+
+            root.querySelectorAll('[data-governance-case]').forEach(function (button) {
+                button.addEventListener('click', function () {
+                    showCase(button.dataset.governanceCase, true);
+                });
+            });
+            showCase('pv', true);
+        }
+
+        function renderFeedbackLab() {
+            return [
+                '<div class="module-lab" id="feedback-lab">',
+                '  <div class="lab-toolbar">',
+                '    <div><div class="lab-kicker">Continuous Improvement Loop</div><strong>从运行结果回流到效果验证，形成持续改进闭环</strong></div>',
+                '  </div>',
+                '  <div class="feedback-module-flow">',
+                '    <div class="feedback-stage-card"><strong>① 真实结果回流</strong>接收实际出力、运行状态和预测效果</div>',
+                '    <div class="feedback-stage-card"><strong>② 问题定位</strong>识别效果下降的场站、时段与任务</div>',
+                '    <div class="feedback-stage-card"><strong>③ 规划调整</strong>更新任务安排和后续改进计划</div>',
+                '    <div class="feedback-stage-card"><strong>④ 效果验证</strong>持续跟踪调整后的预测表现</div>',
+                '  </div>',
+                '  <div class="lab-status"><span>运行结果持续回流</span><strong>问题有记录、调整有依据、效果可验证</strong></div>',
+                '</div>'
+            ].join('');
+        }
+
+
+        function renderAutoMLLab() {
+            return [
+                '<div class="module-lab route-white" id="automl-lab">',
+                '  <div class="lab-toolbar">',
+                '    <div><div class="lab-kicker">Adaptive Model Routing</div><strong>调整场站条件，观察模型路线如何自动切换</strong></div>',
+                '    <div class="lab-presets">',
+                '      <button class="lab-preset active" type="button" data-preset="cold">新场站冷启动</button>',
+                '      <button class="lab-preset" type="button" data-preset="mature">成熟场站</button>',
+                '      <button class="lab-preset" type="button" data-preset="exo-bad">外生数据异常</button>',
+                '    </div>',
+                '  </div>',
+                '  <div class="automl-stage">',
+                '    <section class="signal-panel" aria-label="场站状态输入">',
+                '      <h4>① 场站状态评估</h4>',
+                '      <div class="signal-control">',
+                '        <div class="signal-label"><span>历史样本量</span><strong data-value="samples">18%</strong></div>',
+                '        <input type="range" min="0" max="100" value="18" data-input="samples" aria-label="历史样本量">',
+                '      </div>',
+                '      <div class="signal-control">',
+                '        <div class="signal-label"><span>场站阶段</span><strong data-value="site">新建</strong></div>',
+                '        <div class="site-switch">',
+                '          <button class="lab-preset active" type="button" data-site="new">新建</button>',
+                '          <button class="lab-preset" type="button" data-site="mature">成熟</button>',
+                '        </div>',
+                '      </div>',
+                '      <div class="signal-control">',
+                '        <div class="signal-label"><span>外生数据质量 / 丰富度</span><strong data-value="exo">25%</strong></div>',
+                '        <input type="range" min="0" max="100" value="25" data-input="exo" aria-label="外生数据质量和丰富度">',
+                '      </div>',
+                '    </section>',
+                '    <section class="router-panel" aria-label="智能路由决策">',
+                '      <div class="router-core"><span>AutoML<br>智能路由</span></div>',
+                '      <p class="route-reason" data-role="reason">正在评估场站状态…</p>',
+                '    </section>',
+                '    <section class="routes-panel" aria-label="模型路线输出">',
+                '      <article class="route-card white-route active" data-route="white">',
+                '        <div class="route-title-row"><h4>白盒路线</h4><span class="route-badge">稳健优先</span></div>',
+                '        <p><strong>机理模型 + 领域先验</strong><br>训练透明、可解释的稳定基线，降低小样本过拟合风险。</p>',
+                '      </article>',
+                '      <article class="route-card black-route" data-route="black">',
+                '        <div class="route-title-row"><h4>黑盒路线</h4><span class="route-badge">精度优先</span></div>',
+                '        <p><strong>深度模型 + 自适应集成</strong><br>释放充足数据中的非线性规律，最大化预测精度。</p>',
+                '      </article>',
+                '    </section>',
+                '    <span class="route-particle" aria-hidden="true"></span>',
+                '  </div>',
+                '  <div class="lab-status">',
+                '    <span>当前决策：<strong data-role="route-label">白盒模型</strong></span>',
+                '    <span data-role="objective">目标：保障冷启动阶段的稳健性与可解释性</span>',
+                '  </div>',
+                '</div>'
+            ].join('');
+        }
+
+        function initAutoMLLab() {
+            const root = document.getElementById('automl-lab');
+            const samples = root.querySelector('[data-input="samples"]');
+            const exo = root.querySelector('[data-input="exo"]');
+            let site = 'new';
+
+            const presets = {
+                'cold': { samples: 18, exo: 25, site: 'new' },
+                'mature': { samples: 88, exo: 84, site: 'mature' },
+                'exo-bad': { samples: 86, exo: 18, site: 'mature' }
+            };
+
+            function setActiveSite() {
+                root.querySelectorAll('[data-site]').forEach(function (button) {
+                    button.classList.toggle('active', button.dataset.site === site);
+                });
+                root.querySelector('[data-value="site"]').textContent = site === 'new' ? '新建' : '成熟';
+            }
+
+            function animateRoute() {
+                root.classList.remove('routing');
+                void root.offsetWidth;
+                root.classList.add('routing');
+            }
+
+            function updateRoute(animate) {
+                const sampleValue = Number(samples.value);
+                const exoValue = Number(exo.value);
+                const sampleReady = sampleValue >= 55;
+                const siteReady = site === 'mature';
+                const exoReady = exoValue >= 60;
+                // 稳健保护优先：任一风险信号都走白盒，三项均达标才释放黑盒能力。
+                const blackRoute = sampleReady && siteReady && exoReady;
+                const route = blackRoute ? 'black' : 'white';
+                const routeColor = blackRoute ? '#10b981' : '#3b82f6';
+                const reasons = [];
+
+                root.querySelector('[data-value="samples"]').textContent = sampleValue + '%';
+                root.querySelector('[data-value="exo"]').textContent = exoValue + '%';
+                setActiveSite();
+
+                if (blackRoute) {
+                    reasons.push('历史样本充足');
+                    reasons.push('场站运行成熟');
+                    reasons.push('外生数据质量好且丰富');
+                } else {
+                    if (!sampleReady) reasons.push('历史样本不足');
+                    if (!siteReady) reasons.push('新建场站');
+                    if (!exoReady) reasons.push('外生数据缺失或质量较差');
+                }
+
+                root.classList.toggle('route-white', !blackRoute);
+                root.classList.toggle('route-black', blackRoute);
+                root.style.setProperty('--lab-route', routeColor);
+                root.querySelectorAll('[data-route]').forEach(function (card) {
+                    card.classList.toggle('active', card.dataset.route === route);
+                });
+                root.querySelector('[data-role="reason"]').innerHTML =
+                    '判定依据：<strong>' + reasons.join(' · ') + '</strong><br>' +
+                    (blackRoute ? '数据条件满足高精度建模门槛' : '任一风险信号触发稳健保护');
+                root.querySelector('[data-role="route-label"]').textContent = blackRoute ? '黑盒模型' : '白盒模型';
+                root.querySelector('[data-role="objective"]').textContent = blackRoute
+                    ? '目标：充分拟合复杂非线性模式，提升预测精度'
+                    : '目标：保障冷启动或数据不佳条件下的稳健性与可解释性';
+
+                if (animate !== false) animateRoute();
+            }
+
+            root.querySelectorAll('[data-preset]').forEach(function (button) {
+                button.addEventListener('click', function () {
+                    const config = presets[button.dataset.preset];
+                    samples.value = config.samples;
+                    exo.value = config.exo;
+                    site = config.site;
+                    root.querySelectorAll('[data-preset]').forEach(function (item) {
+                        item.classList.toggle('active', item === button);
+                    });
+                    updateRoute(true);
+                });
+            });
+
+            root.querySelectorAll('[data-site]').forEach(function (button) {
+                button.addEventListener('click', function () {
+                    site = button.dataset.site;
+                    root.querySelectorAll('[data-preset]').forEach(function (item) { item.classList.remove('active'); });
+                    updateRoute(true);
+                });
+            });
+
+            [samples, exo].forEach(function (input) {
+                input.addEventListener('input', function () {
+                    root.querySelectorAll('[data-preset]').forEach(function (item) { item.classList.remove('active'); });
+                    updateRoute(true);
+                });
+            });
+
+            updateRoute(true);
+        }
+
+        function createPredictionAgentDemo() {
+            return `
+                <div class="forecast-demo">
+                    <div class="forecast-model-grid" id="forecast-model-grid">
+                        <div class="forecast-model-card" data-series="arima">
+                            <div class="forecast-model-title">ARIMA</div>
+                            <div class="forecast-model-desc">稳态基线，适合趋势平稳、样本较少的场站。</div>
+                            <div class="forecast-weight-row">
+                                <label for="weight-arima">权重</label>
+                                <input id="weight-arima" type="range" min="0" max="100" value="78" data-weight="arima">
+                                <span data-weight-value="arima">78%</span>
+                            </div>
+                        </div>
+                        <div class="forecast-model-card" data-series="timesfm">
+                            <div class="forecast-model-title">TimesFM 2.5</div>
+                            <div class="forecast-model-desc">通用时序基础模型，捕捉中长期趋势与周期。</div>
+                            <div class="forecast-weight-row">
+                                <label for="weight-timesfm">权重</label>
+                                <input id="weight-timesfm" type="range" min="0" max="100" value="6" data-weight="timesfm">
+                                <span data-weight-value="timesfm">6%</span>
+                            </div>
+                        </div>
+                        <div class="forecast-model-card" data-series="chronos">
+                            <div class="forecast-model-title">Chronos-2</div>
+                            <div class="forecast-model-desc">概率预测与分位数区间，强化不确定性表达。</div>
+                            <div class="forecast-weight-row">
+                                <label for="weight-chronos">权重</label>
+                                <input id="weight-chronos" type="range" min="0" max="100" value="2" data-weight="chronos">
+                                <span data-weight-value="chronos">2%</span>
+                            </div>
+                        </div>
+                        <div class="forecast-model-card" data-series="moirai">
+                            <div class="forecast-model-title">Moirai-2</div>
+                            <div class="forecast-model-desc">多变量跨域迁移，融合气象与运行外生变量。</div>
+                            <div class="forecast-weight-row">
+                                <label for="weight-moirai">权重</label>
+                                <input id="weight-moirai" type="range" min="0" max="100" value="14" data-weight="moirai">
+                                <span data-weight-value="moirai">14%</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="forecast-chart-wrap">
+                        <div class="forecast-chart-head">
+                            <div class="forecast-chart-title">输入曲线 → 多方法预测 → 动态集成预测</div>
+                            <div class="forecast-chart-hint">点击卡片或图例高亮；拖动权重重算集成曲线</div>
+                        </div>
+                        <svg class="forecast-chart" id="forecast-chart" viewBox="0 0 850 230" role="img" aria-label="预测 Agent 多模型集成折线图"></svg>
+                        <div class="forecast-legend" id="forecast-legend"></div>
+                    </div>
+                </div>`;
+        }
+
+        function initPredictionAgentDemo(root) {
+            const chart = root.querySelector('#forecast-chart');
+            const legend = root.querySelector('#forecast-legend');
+            const cards = Array.from(root.querySelectorAll('.forecast-model-card'));
+            const sliders = Array.from(root.querySelectorAll('[data-weight]'));
+            let activeSeries = 'all';
+
+            const input = [
+                0.4, 0.4, 1.8, 4.0, 3.9, 3.1, 5.4, 2.2, 2.9, 4.2, 4.7, 3.5,
+                2.7, 5.2, 4.0, 5.1, 4.5, 4.6, 2.2, 1.5, 1.6, 3.5, 4.0, 3.3,
+                4.6, 5.9, 5.2, 5.1, 3.4, 2.7, 2.1, 4.1, 4.0, 2.6, 2.0, 3.8
+            ];
+            const actual = [4.2, 3.0, 4.6, 2.9, 3.5, 1.8, 1.7, 1.0, 0.6, 1.3, 2.7, 2.1];
+            const models = {
+                arima: { label: 'ARIMA', color: '#2563eb', values: [4.1, 3.0, 4.5, 2.9, 3.45, 1.85, 1.75, 1.05, 0.65, 1.25, 2.65, 2.15] },
+                timesfm: { label: 'TimesFM 2.5', color: '#8a1c52', values: [4.1, 4.15, 4.2, 4.25, 4.32, 4.38, 4.45, 4.5, 4.55, 4.58, 4.62, 4.65] },
+                chronos: { label: 'Chronos-2', color: '#7c3aed', values: [4.0, 4.6, 4.9, 5.2, 5.55, 5.75, 5.9, 5.95, 6.0, 6.0, 5.95, 5.9] },
+                moirai: { label: 'Moirai-2', color: '#d97706', values: [3.8, 3.5, 3.0, 2.5, 2.0, 1.6, 1.3, 1.1, 1.0, 0.9, 0.8, 0.7] }
+            };
+            const seriesMeta = {
+                input: { label: '输入历史', color: '#2f9e44' },
+                actual: { label: '真实值', color: '#166534' },
+                ensemble: { label: '最终集成预测', color: '#e11d48' },
+                ...models
+            };
+
+            const x0 = 52;
+            const y0 = 186;
+            const plotW = 746;
+            const plotH = 148;
+            const totalPoints = input.length + actual.length;
+            const step = plotW / (totalPoints - 1);
+            const yScale = value => y0 - ((value - 0.2) / (7.4 - 0.2)) * plotH;
+            const xScale = index => x0 + index * step;
+            const pathFrom = (values, offset) => values.map((value, index) => `${index ? 'L' : 'M'} ${xScale(index + offset).toFixed(1)} ${yScale(value).toFixed(1)}`).join(' ');
+
+            function rebalanceWeights(changedKey) {
+                const changed = sliders.find(slider => slider.dataset.weight === changedKey);
+                const others = sliders.filter(slider => slider.dataset.weight !== changedKey);
+                const remaining = 100 - Number(changed.value);
+                const otherTotal = others.reduce((sum, slider) => sum + Number(slider.value), 0);
+                if (otherTotal <= 0) {
+                    const even = remaining / others.length;
+                    others.forEach(slider => {
+                        slider.value = Math.round(even);
+                    });
+                    return;
+                }
+                let assigned = 0;
+                others.forEach((slider, index) => {
+                    const nextValue = index === others.length - 1
+                        ? remaining - assigned
+                        : Math.round((Number(slider.value) / otherTotal) * remaining);
+                    slider.value = Math.max(0, nextValue);
+                    assigned += Number(slider.value);
+                });
+            }
+
+            function currentWeights() {
+                const raw = {};
+                sliders.forEach(slider => {
+                    raw[slider.dataset.weight] = Number(slider.value);
+                    root.querySelector(`[data-weight-value="${slider.dataset.weight}"]`).innerText = `${slider.value}%`;
+                });
+                const total = Object.values(raw).reduce((sum, value) => sum + value, 0);
+                if (total <= 0) {
+                    return Object.fromEntries(Object.keys(raw).map(key => [key, 1 / Object.keys(raw).length]));
+                }
+                return Object.fromEntries(Object.entries(raw).map(([key, value]) => [key, value / total]));
+            }
+
+            function ensembleValues() {
+                const weights = currentWeights();
+                return actual.map((_, index) => Object.keys(models).reduce((sum, key) => {
+                    return sum + models[key].values[index] * weights[key];
+                }, 0));
+            }
+
+            function draw() {
+                const ensemble = ensembleValues();
+                const forecastOffset = input.length;
+                const lines = [
+                    { key: 'input', path: pathFrom(input, 0), color: seriesMeta.input.color, width: 2.5 },
+                    ...Object.entries(models).map(([key, model]) => ({ key, path: pathFrom(model.values, forecastOffset), color: model.color, width: 2 })),
+                    { key: 'actual', path: pathFrom(actual, forecastOffset), color: seriesMeta.actual.color, width: 2.6 },
+                    { key: 'ensemble', path: pathFrom(ensemble, forecastOffset), color: seriesMeta.ensemble.color, width: 3.2 }
+                ];
+
+                chart.innerHTML = `
+                    <rect x="0" y="0" width="850" height="230" fill="#ffffff"></rect>
+                    <rect x="${xScale(input.length - 0.5)}" y="${y0 - plotH - 14}" width="${x0 + plotW - xScale(input.length - 0.5)}" height="${plotH + 22}" fill="#eff6ff" opacity="0.55"></rect>
+                    <g stroke="#e2e8f0" stroke-width="1">
+                        <path d="M ${x0} ${y0} H ${x0 + plotW}"></path>
+                        <path d="M ${x0} ${y0 - plotH / 2} H ${x0 + plotW}"></path>
+                        <path d="M ${x0} ${y0 - plotH} H ${x0 + plotW}"></path>
+                        <path d="M ${xScale(input.length - 0.5)} ${y0 - plotH - 14} V ${y0 + 8}" stroke-dasharray="6 5"></path>
+                    </g>
+                    <g fill="#64748b" font-size="13" font-weight="700">
+                        <text x="${x0}" y="24">历史输入</text>
+                        <text x="${xScale(input.length - 0.5)}" y="${y0 + 28}" text-anchor="middle">当前时刻</text>
+                        <text x="14" y="${y0 - plotH + 4}">7</text>
+                        <text x="14" y="${y0 + 4}">0</text>
+                    </g>
+                    ${lines.map(line => `
+                        <path
+                            d="${line.path}"
+                            fill="none"
+                            stroke="${line.color}"
+                            stroke-width="${activeSeries === line.key ? line.width + 1.2 : line.width}"
+                            stroke-linecap="round"
+                            stroke-linejoin="round"
+                            opacity="${activeSeries === 'all' || activeSeries === line.key ? 1 : 0.28}"
+                            data-chart-series="${line.key}"
+                            style="cursor:pointer"
+                        ></path>
+                    `).join('')}
+                    <g>
+                        ${ensemble.map((value, index) => `<circle cx="${xScale(index + forecastOffset).toFixed(1)}" cy="${yScale(value).toFixed(1)}" r="${activeSeries === 'ensemble' ? 3.4 : 2.4}" fill="${seriesMeta.ensemble.color}" opacity="${activeSeries === 'all' || activeSeries === 'ensemble' ? 1 : 0.35}"></circle>`).join('')}
+                    </g>
+                `;
+                chart.querySelectorAll('[data-chart-series]').forEach(path => {
+                    path.addEventListener('click', () => setActive(path.dataset.chartSeries));
+                });
+            }
+
+            function renderLegend() {
+                legend.innerHTML = ['all', 'input', 'actual', 'arima', 'timesfm', 'chronos', 'moirai', 'ensemble'].map(key => {
+                    const meta = key === 'all' ? { label: '全部', color: '#64748b' } : seriesMeta[key];
+                    return `<button type="button" data-legend="${key}" class="${activeSeries === key ? 'active' : ''}"><span style="color:${meta.color}">●</span> ${meta.label}</button>`;
+                }).join('');
+                legend.querySelectorAll('button').forEach(button => {
+                    button.addEventListener('click', () => setActive(button.dataset.legend));
+                });
+            }
+
+            function setActive(key) {
+                activeSeries = key;
+                cards.forEach(card => card.classList.toggle('active', card.dataset.series === key));
+                draw();
+                renderLegend();
+            }
+
+            cards.forEach(card => {
+                card.addEventListener('click', () => setActive(card.dataset.series));
+            });
+            sliders.forEach(slider => {
+                slider.addEventListener('input', () => {
+                    rebalanceWeights(slider.dataset.weight);
+                    draw();
+                });
+                slider.addEventListener('click', event => event.stopPropagation());
+            });
+
+            draw();
+            renderLegend();
+        }
+
+        function renderDiagnosisLab() {
+            return [
+                '<div class="module-lab" id="diagnosis-lab">',
+                '  <div class="lab-toolbar">',
+                '    <div><div class="lab-kicker">Explainable Error Attribution</div><strong>选择异常工况，查看误差如何自动归因并触发重规划</strong></div>',
+                '    <div class="lab-presets">',
+                '      <button class="lab-preset active" type="button" data-diagnosis="weather">气象突变</button>',
+                '      <button class="lab-preset" type="button" data-diagnosis="drift">模型漂移</button>',
+                '      <button class="lab-preset" type="button" data-diagnosis="noise">数据噪声</button>',
+                '    </div>',
+                '  </div>',
+                '  <div class="diagnosis-flow">',
+                '    <div class="process-card">',
+                '      <h4>预测误差逐层归因</h4>',
+                '      <svg class="process-svg" viewBox="0 0 500 205" role="img" aria-label="气象突变导致实际出力瞬时下挫，预测曲线响应滞后" data-role="diagnosis-chart">',
+                '        <g stroke="#e2e8f0"><line x1="30" y1="175" x2="475" y2="175"/><line x1="30" y1="30" x2="30" y2="175"/></g>',
+                '        <g data-role="event-annotation" class="event-annotation">',
+                '          <rect x="288" y="34" width="68" height="140" rx="6" fill="#fef3c7" opacity="0.55"/>',
+                '          <line x1="305" y1="45" x2="305" y2="170" stroke="#f59e0b" stroke-width="1.5" stroke-dasharray="4 3"/>',
+                '          <text x="322" y="51" text-anchor="middle" font-size="10" fill="#b45309">☁ 突发云团</text>',
+                '        </g>',
+                '        <polyline class="diagnosis-series" data-role="actual-series" points="35,145 65,135 95,112 125,90 155,85 185,98 215,118 245,125 275,105 305,155 335,148 365,110 395,88 425,75 455,92 470,98" stroke="#10b981" stroke-width="3"/>',
+                '        <polyline class="diagnosis-series" data-role="predicted-series" points="35,147 65,136 95,116 125,94 155,88 185,100 215,120 245,127 275,108 305,92 335,82 365,84 395,86 425,80 455,96 470,102" stroke="#8a1c52" stroke-width="3" stroke-dasharray="7 5"/>',
+                '        <g font-size="10"><text x="40" y="194" fill="#10b981">— 实际出力</text><text x="135" y="194" fill="#8a1c52">┄ 预测出力</text><text x="470" y="194" fill="#64748b" text-anchor="end">时间</text></g>',
+                '      </svg>',
+                '      <div class="lab-status"><span data-role="series-note">突发遮挡使实际出力瞬时下挫，模型响应出现滞后</span><strong data-role="deviation-type">突发性偏差</strong></div>',
+                '    </div>',
+                '    <aside class="diagnose-summary">',
+                '      <h4>根因贡献度</h4>',
+                '      <div class="cause-row" data-cause="weather"><span>气象误差</span><div class="cause-track"><div class="cause-fill" style="--cause-color:#f59e0b;--cause-width:62%"></div></div><strong>62%</strong></div>',
+                '      <div class="cause-row" data-cause="model"><span>模型局限</span><div class="cause-track"><div class="cause-fill" style="--cause-color:#3b82f6;--cause-width:24%"></div></div><strong>24%</strong></div>',
+                '      <div class="cause-row" data-cause="data"><span>数据噪声</span><div class="cause-track"><div class="cause-fill" style="--cause-color:#10b981;--cause-width:14%"></div></div><strong>14%</strong></div>',
+                '      <div class="feedback-callout"><strong data-role="diagnosis-title">主因：气象输入突变</strong><br><span data-role="diagnosis-action">反馈动作：提高临近气象权重，并触发短周期重预测。</span></div>',
+                '    </aside>',
+                '  </div>',
+                '</div>'
+            ].join('');
+        }
+
+        function initDiagnosisLab() {
+            const root = document.getElementById('diagnosis-lab');
+            const configs = {
+                weather: {
+                    values: { weather: 62, model: 24, data: 14 },
+                    title: '主因：气象输入突变',
+                    action: '反馈动作：提高临近气象权重，并触发短周期重预测。',
+                    actual: '35,145 65,135 95,112 125,90 155,85 185,98 215,118 245,125 275,105 305,155 335,148 365,110 395,88 425,75 455,92 470,98',
+                    predicted: '35,147 65,136 95,116 125,94 155,88 185,100 215,120 245,127 275,108 305,92 335,82 365,84 395,86 425,80 455,96 470,102',
+                    chartLabel: '气象突变导致实际出力瞬时下挫，预测曲线响应滞后',
+                    note: '突发遮挡使实际出力瞬时下挫，模型响应出现滞后',
+                    deviation: '突发性偏差',
+                    annotation:
+                        '<rect x="288" y="34" width="68" height="140" rx="6" fill="#fef3c7" opacity="0.55"/>' +
+                        '<line x1="305" y1="45" x2="305" y2="170" stroke="#f59e0b" stroke-width="1.5" stroke-dasharray="4 3"/>' +
+                        '<text x="322" y="51" text-anchor="middle" font-size="10" fill="#b45309">☁ 突发云团</text>'
+                },
+                drift: {
+                    values: { weather: 18, model: 68, data: 14 },
+                    title: '主因：模型发生漂移',
+                    action: '反馈动作：回流近期样本，重启 AutoML 实验与模型重规划。',
+                    actual: '35,150 65,140 95,125 125,105 155,90 185,95 215,110 245,125 275,115 305,100 335,82 365,75 395,86 425,100 455,92 470,96',
+                    predicted: '35,151 65,141 95,126 125,107 155,93 185,100 215,117 245,134 275,128 305,119 335,108 365,105 395,119 425,136 455,134 470,142',
+                    chartLabel: '模型预测曲线随时间逐渐偏离实际出力，系统性误差持续扩大',
+                    note: '预测偏差随时间单向累积，呈现持续扩大的系统性偏移',
+                    deviation: '渐进式漂移',
+                    annotation:
+                        '<path d="M245 125 L275 115 L305 100 L335 82 L365 75 L395 86 L425 100 L455 92 L470 96 L470 142 L455 134 L425 136 L395 119 L365 105 L335 108 L305 119 L275 128 L245 134 Z" fill="#dbeafe" opacity="0.55"/>' +
+                        '<path d="M278 61 L440 61" stroke="#3b82f6" stroke-width="1.5" stroke-dasharray="4 3"/>' +
+                        '<polygon points="440,61 433,57 433,65" fill="#3b82f6"/>' +
+                        '<text x="355" y="51" text-anchor="middle" font-size="10" fill="#1d4ed8">偏差随时间扩大</text>'
+                },
+                noise: {
+                    values: { weather: 15, model: 20, data: 65 },
+                    title: '主因：数据噪声累积',
+                    action: '反馈动作：回退到可信数据窗口，并重新执行数据治理。',
+                    actual: '35,145 65,105 95,155 125,82 155,150 185,90 215,160 245,75 275,142 305,88 335,155 365,68 395,145 425,98 455,152 470,112',
+                    predicted: '35,143 65,135 95,122 125,110 155,100 185,102 215,112 245,120 275,115 305,105 335,94 365,90 395,98 425,106 455,103 470,108',
+                    chartLabel: '实际采集数据出现多次高频尖峰和毛刺，预测曲线保持平滑主趋势',
+                    note: '采集值出现密集尖峰与毛刺，预测主趋势仍保持平滑',
+                    deviation: '高频随机噪声',
+                    annotation:
+                        '<g fill="#fff" stroke="#ef4444" stroke-width="2">' +
+                        '<circle cx="95" cy="155" r="5"/><circle cx="125" cy="82" r="5"/><circle cx="215" cy="160" r="5"/><circle cx="245" cy="75" r="5"/><circle cx="335" cy="155" r="5"/><circle cx="365" cy="68" r="5"/>' +
+                        '</g>' +
+                        '<text x="300" y="45" text-anchor="middle" font-size="10" fill="#b91c1c">传感器尖峰 / 毛刺</text>'
+                }
+            };
+
+            function parsePoints(value) {
+                return value.trim().split(/\s+/).map(function (pair) {
+                    return pair.split(',').map(Number);
+                });
+            }
+
+            function morphPolyline(element, targetValue, shouldAnimate) {
+                const target = parsePoints(targetValue);
+                const current = parsePoints(element.getAttribute('points'));
+                const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+                if (element._morphFrame) cancelAnimationFrame(element._morphFrame);
+                if (!shouldAnimate || reduceMotion || current.length !== target.length) {
+                    element.setAttribute('points', targetValue);
+                    return;
+                }
+
+                const startedAt = performance.now();
+                const duration = 620;
+
+                function frame(now) {
+                    const progress = Math.min((now - startedAt) / duration, 1);
+                    const eased = 1 - Math.pow(1 - progress, 3);
+                    const points = current.map(function (point, index) {
+                        const x = point[0] + (target[index][0] - point[0]) * eased;
+                        const y = point[1] + (target[index][1] - point[1]) * eased;
+                        return x.toFixed(1) + ',' + y.toFixed(1);
+                    }).join(' ');
+                    element.setAttribute('points', points);
+                    if (progress < 1) element._morphFrame = requestAnimationFrame(frame);
+                }
+
+                element._morphFrame = requestAnimationFrame(frame);
+            }
+
+            function setDiagnosis(name, shouldAnimate) {
+                const config = configs[name];
+                root.querySelectorAll('[data-diagnosis]').forEach(function (button) {
+                    button.classList.toggle('active', button.dataset.diagnosis === name);
+                });
+                root.querySelectorAll('[data-cause]').forEach(function (row) {
+                    const value = config.values[row.dataset.cause];
+                    row.querySelector('.cause-fill').style.setProperty('--cause-width', value + '%');
+                    row.querySelector('strong').textContent = value + '%';
+                });
+                root.querySelector('[data-role="diagnosis-title"]').textContent = config.title;
+                root.querySelector('[data-role="diagnosis-action"]').textContent = config.action;
+                root.querySelector('[data-role="series-note"]').textContent = config.note;
+                root.querySelector('[data-role="deviation-type"]').textContent = config.deviation;
+                root.querySelector('[data-role="diagnosis-chart"]').setAttribute('aria-label', config.chartLabel);
+                root.querySelector('[data-role="event-annotation"]').innerHTML = config.annotation;
+                morphPolyline(root.querySelector('[data-role="actual-series"]'), config.actual, shouldAnimate !== false);
+                morphPolyline(root.querySelector('[data-role="predicted-series"]'), config.predicted, shouldAnimate !== false);
+                if (shouldAnimate !== false) replayLab(root);
+            }
+
+            root.querySelectorAll('[data-diagnosis]').forEach(function (button) {
+                button.addEventListener('click', function () { setDiagnosis(button.dataset.diagnosis, true); });
+            });
+            setDiagnosis('weather', false);
+        }
+
+        /* ========================================================
+           模块可视化（内联 SVG 静态示意图，无需外部图片）
+           ======================================================== */
+
+        // 通用：返回 SVG 字符串容器
+        function svgWrap(inner, caption) {
+            return inner + '<div class="visual-caption">' + caption + '</div>';
+        }
+
+        // 1. 数据治理 Agent：清洗前后折线对比
+        function svgDataGovernance() {
+            return svgWrap(
+                '<svg viewBox="0 0 560 240" xmlns="http://www.w3.org/2000/svg">' +
+                // 左侧：原始数据（带噪点与缺口）
+                '<text x="70" y="22" font-size="13" fill="#64748b" text-anchor="middle" font-weight="bold">清洗前：原始数据</text>' +
+                '<rect x="20" y="30" width="160" height="180" fill="#fff" stroke="#e2e8f0" rx="6"/>' +
+                // 坐标轴
+                '<line x1="35" y1="200" x2="170" y2="200" stroke="#cbd5e1"/>' +
+                '<line x1="35" y1="40" x2="35" y2="200" stroke="#cbd5e1"/>' +
+                // 噪点折线（锯齿 + 缺口）
+                '<polyline points="40,150 55,120 65,165 70,95 80,175 90,140 95,95 105,160 115,110 125,180 135,100 145,160" ' +
+                'fill="none" stroke="#db2777" stroke-width="2" stroke-linejoin="round"/>' +
+                // 缺口标记
+                '<line x1="100" y1="40" x2="100" y2="200" stroke="#ef4444" stroke-width="1" stroke-dasharray="3,3"/>' +
+                '<text x="103" y="50" font-size="9" fill="#ef4444">缺口</text>' +
+                // 噪点
+                '<circle cx="55" cy="120" r="2.5" fill="#fca5a5"/>' +
+                '<circle cx="80" cy="175" r="2.5" fill="#fca5a5"/>' +
+                '<circle cx="125" cy="180" r="2.5" fill="#fca5a5"/>' +
+
+                // 箭头
+                '<polygon points="195,120 215,112 215,128" fill="#8a1c52"/>' +
+                '<line x1="185" y1="120" x2="213" y2="120" stroke="#8a1c52" stroke-width="2"/>' +
+
+                // 右侧：清洗后数据（平滑连续）
+                '<text x="380" y="22" font-size="13" fill="#64748b" text-anchor="middle" font-weight="bold">清洗后：可用数据</text>' +
+                '<rect x="225" y="30" width="160" height="180" fill="#fff" stroke="#e2e8f0" rx="6"/>' +
+                '<line x1="240" y1="200" x2="375" y2="200" stroke="#cbd5e1"/>' +
+                '<line x1="240" y1="40" x2="240" y2="200" stroke="#cbd5e1"/>' +
+                // 平滑曲线
+                '<path d="M245,155 Q265,120 285,130 T325,110 T365,125" fill="none" stroke="#10b981" stroke-width="2.5"/>' +
+                // 补齐标记
+                '<circle cx="305" cy="115" r="3" fill="none" stroke="#3b82f6" stroke-width="1.5"/>' +
+                '<text x="312" y="112" font-size="9" fill="#3b82f6">补齐</text>' +
+
+                // 右侧标签
+                '<text x="410" y="80" font-size="11" fill="#475569">· 缺口自动补齐</text>' +
+                '<text x="410" y="105" font-size="11" fill="#475569">· 异常噪点剔除</text>' +
+                '<text x="410" y="130" font-size="11" fill="#475569">· 气象质量检测</text>' +
+                '<text x="410" y="155" font-size="11" fill="#475569">· 统一时序对齐</text>' +
+                '</svg>',
+                '输入：含噪点与缺口的原始时序 + 气象数据 　→　输出：连续、可信的统一数据集'
+            );
+        }
+
+        // 2. AutoML 核心决策引擎：条件判定 → 双轨分流（动态）
+        function svgAutoML() {
+            return svgWrap(
+                '<svg viewBox="0 0 580 270" xmlns="http://www.w3.org/2000/svg">' +
+                // ===== 左侧：判定条件输入 =====
+                '<rect x="10" y="70" width="120" height="110" rx="8" fill="#fff" stroke="#8a1c52" stroke-width="2"/>' +
+                '<text x="70" y="90" font-size="11" fill="#8a1c52" text-anchor="middle" font-weight="bold">场站状态评估</text>' +
+                '<line x1="20" y1="98" x2="120" y2="98" stroke="#e2e8f0"/>' +
+                '<text x="18" y="114" font-size="9.5" fill="#475569">· 历史数据量</text>' +
+                '<text x="18" y="130" font-size="9.5" fill="#475569">· 场站成熟度</text>' +
+                '<text x="18" y="146" font-size="9.5" fill="#475569">· 外生数据质量</text>' +
+                '<text x="18" y="162" font-size="9.5" fill="#475569">· 外生数据丰富度</text>' +
+
+                // ===== 中间：分流判定（菱形） =====
+                '<polygon points="210,125 250,95 290,125 250,155" fill="#fdf2f8" stroke="#8a1c52" stroke-width="2"/>' +
+                '<text x="250" y="122" font-size="10" fill="#8a1c52" text-anchor="middle" font-weight="bold">智能</text>' +
+                '<text x="250" y="136" font-size="10" fill="#8a1c52" text-anchor="middle" font-weight="bold">路由</text>' +
+
+                // 左 → 菱形 连线
+                '<line x1="130" y1="125" x2="208" y2="125" stroke="#8a1c52" stroke-width="2"/>' +
+                '<polygon points="208,125 202,122 202,128" fill="#8a1c52"/>' +
+
+                // ===== 上路：白盒（数据少/新场站/外生差） =====
+                // 分流线（动画流动）
+                '<line x1="270" y1="100" x2="330" y2="60" stroke="#3b82f6" stroke-width="2.5" class="automl-flow"/>' +
+                '<polygon points="330,60 322,62 324,54" fill="#3b82f6"/>' +
+                // 条件标注
+                '<rect x="278" y="58" width="50" height="34" rx="4" fill="#eff6ff" stroke="#3b82f6" stroke-width="1"/>' +
+                '<text x="303" y="71" font-size="8.5" fill="#3b82f6" text-anchor="middle">数据少</text>' +
+                '<text x="303" y="83" font-size="8.5" fill="#3b82f6" text-anchor="middle">外生差</text>' +
+
+                // 白盒路线框
+                '<rect x="335" y="30" width="140" height="60" rx="8" fill="#eff6ff" stroke="#3b82f6" stroke-width="2"/>' +
+                '<text x="405" y="50" font-size="13" fill="#3b82f6" text-anchor="middle" font-weight="bold">「白盒」路线</text>' +
+                '<text x="405" y="66" font-size="9.5" fill="#475569" text-anchor="middle">训练白盒模型</text>' +
+                '<text x="405" y="80" font-size="9.5" fill="#475569" text-anchor="middle">机理驱动 · 可解释</text>' +
+
+                // 白盒触发条件（左侧细列表）
+                '<text x="335" y="105" font-size="8.5" fill="#3b82f6">▸ 新建场站 · 历史数据稀缺</text>' +
+                '<text x="335" y="117" font-size="8.5" fill="#3b82f6">▸ 外生数据缺失或质量差</text>' +
+
+                // 白盒输出
+                '<rect x="495" y="42" width="75" height="36" rx="6" fill="#fff" stroke="#3b82f6"/>' +
+                '<text x="532" y="58" font-size="10" fill="#3b82f6" text-anchor="middle" font-weight="bold">保障</text>' +
+                '<text x="532" y="71" font-size="10" fill="#3b82f6" text-anchor="middle">稳健性</text>' +
+                '<line x1="475" y1="60" x2="493" y2="60" stroke="#3b82f6" stroke-width="1.5" class="automl-flow"/>' +
+                '<polygon points="493,60 487,57 487,63" fill="#3b82f6"/>' +
+
+                // ===== 下路：黑盒（数据多/成熟场站/外生好） =====
+                '<line x1="270" y1="150" x2="330" y2="195" stroke="#10b981" stroke-width="2.5" class="automl-flow"/>' +
+                '<polygon points="330,195 322,191 324,199" fill="#10b981"/>' +
+                // 条件标注
+                '<rect x="278" y="165" width="50" height="34" rx="4" fill="#ecfdf5" stroke="#10b981" stroke-width="1"/>' +
+                '<text x="303" y="178" font-size="8.5" fill="#10b981" text-anchor="middle">数据多</text>' +
+                '<text x="303" y="190" font-size="8.5" fill="#10b981" text-anchor="middle">外生好</text>' +
+
+                // 黑盒路线框
+                '<rect x="335" y="165" width="140" height="60" rx="8" fill="#ecfdf5" stroke="#10b981" stroke-width="2"/>' +
+                '<text x="405" y="185" font-size="13" fill="#10b981" text-anchor="middle" font-weight="bold">「黑盒」路线</text>' +
+                '<text x="405" y="201" font-size="9.5" fill="#475569" text-anchor="middle">训练黑盒模型</text>' +
+                '<text x="405" y="215" font-size="9.5" fill="#475569" text-anchor="middle">数据驱动 · 自适应集成</text>' +
+
+                // 黑盒触发条件
+                '<text x="335" y="240" font-size="8.5" fill="#10b981">▸ 成熟场站 · 历史数据充足</text>' +
+                '<text x="335" y="252" font-size="8.5" fill="#10b981">▸ 外生数据质量好且丰富</text>' +
+
+                // 黑盒输出
+                '<rect x="495" y="177" width="75" height="36" rx="6" fill="#fff" stroke="#10b981"/>' +
+                '<text x="532" y="193" font-size="10" fill="#10b981" text-anchor="middle" font-weight="bold">提升</text>' +
+                '<text x="532" y="206" font-size="10" fill="#10b981" text-anchor="middle">预测精度</text>' +
+                '<line x1="475" y1="195" x2="493" y2="195" stroke="#10b981" stroke-width="1.5" class="automl-flow"/>' +
+                '<polygon points="493,195 487,192 487,198" fill="#10b981"/>' +
+
+                // ===== Sandbox 外框 =====
+                '<rect x="200" y="15" width="295" height="250" fill="none" stroke="#475569" stroke-width="1.5" stroke-dasharray="5,4" rx="10"/>' +
+                '<rect x="305" y="7" width="85" height="16" fill="#f8fafc"/>' +
+                '<text x="347" y="19" font-size="10" fill="#475569" text-anchor="middle" font-weight="bold">Sandbox 沙盒</text>' +
+                '</svg>',
+                '输入：场站状态（数据量 / 成熟度 / 外生数据质量）　→　沙盒自动路由　→　白盒保障稳健 或 黑盒提升精度'
+            );
+        }
+
+        // 3. 预测 Agent：预测曲线 + 置信区间
+        function svgPredict() {
+            return svgWrap(
+                '<svg viewBox="0 0 560 240" xmlns="http://www.w3.org/2000/svg">' +
+                // 坐标轴
+                '<line x1="50" y1="200" x2="520" y2="200" stroke="#94a3b8" stroke-width="1.5"/>' +
+                '<line x1="50" y1="30" x2="50" y2="200" stroke="#94a3b8" stroke-width="1.5"/>' +
+                '<text x="525" y="205" font-size="10" fill="#94a3b8">时间</text>' +
+                '<text x="45" y="28" font-size="10" fill="#94a3b8" text-anchor="end">出力</text>' +
+
+                // 置信区间（上下虚线 + 填充）
+                '<path d="M60,150 Q140,90 220,110 T380,80 T510,120 L510,170 Q380,140 300,150 T140,180 T60,150 Z" ' +
+                'fill="#dbeafe" opacity="0.6"/>' +
+                '<polyline points="60,145 140,85 220,105 300,115 380,75 450,110 510,115" ' +
+                'fill="none" stroke="#3b82f6" stroke-width="1" stroke-dasharray="4,3"/>' +
+                '<polyline points="60,170 140,125 220,140 300,155 380,110 450,150 510,165" ' +
+                'fill="none" stroke="#3b82f6" stroke-width="1" stroke-dasharray="4,3"/>' +
+
+                // 点预测曲线（实线）
+                '<path d="M60,155 Q140,100 220,120 T380,90 T510,135" fill="none" stroke="#8a1c52" stroke-width="3"/>' +
+
+                // 实际值散点
+                '<circle cx="80" cy="148" r="3" fill="#10b981"/>' +
+                '<circle cx="150" cy="108" r="3" fill="#10b981"/>' +
+                '<circle cx="230" cy="118" r="3" fill="#10b981"/>' +
+                '<circle cx="310" cy="128" r="3" fill="#10b981"/>' +
+                '<circle cx="400" cy="92" r="3" fill="#10b981"/>' +
+
+                // 分割线：历史 / 未来
+                '<line x1="310" y1="30" x2="310" y2="200" stroke="#f59e0b" stroke-width="1.5" stroke-dasharray="3,3"/>' +
+                '<text x="180" y="45" font-size="10" fill="#64748b">历史区间</text>' +
+                '<text x="400" y="45" font-size="10" fill="#f59e0b">未来预测</text>' +
+
+                // 图例
+                '<line x1="60" y1="222" x2="85" y2="222" stroke="#8a1c52" stroke-width="3"/>' +
+                '<text x="92" y="226" font-size="10" fill="#475569">点预测</text>' +
+                '<rect x="155" y="218" width="25" height="8" fill="#dbeafe"/>' +
+                '<text x="186" y="226" font-size="10" fill="#475569">置信区间</text>' +
+                '<circle cx="265" cy="222" r="3" fill="#10b981"/>' +
+                '<text x="274" y="226" font-size="10" fill="#475569">实际出力</text>' +
+                '</svg>',
+                '输入：治理后数据 + 路由策略 　→　输出：出力点预测曲线 + 概率置信区间'
+            );
+        }
+
+        // 4. 解释诊断 Agent：误差归因瀑布图
+        function svgDiagnose() {
+            return svgWrap(
+                '<svg viewBox="0 0 560 240" xmlns="http://www.w3.org/2000/svg">' +
+                // 坐标轴
+                '<line x1="60" y1="200" x2="520" y2="200" stroke="#94a3b8" stroke-width="1.5"/>' +
+                '<line x1="60" y1="30" x2="60" y2="200" stroke="#94a3b8" stroke-width="1.5"/>' +
+                '<text x="525" y="205" font-size="10" fill="#94a3b8">归因项</text>' +
+                '<text x="55" y="28" font-size="10" fill="#94a3b8" text-anchor="end">误差</text>' +
+
+                // 柱1：总误差
+                '<rect x="80" y="50" width="70" height="150" fill="#8a1c52" opacity="0.85"/>' +
+                '<text x="115" y="215" font-size="11" fill="#475569" text-anchor="middle">总误差</text>' +
+                '<text x="115" y="44" font-size="10" fill="#8a1c52" text-anchor="middle" font-weight="bold">100%</text>' +
+
+                // 连接线
+                '<line x1="150" y1="50" x2="170" y2="80" stroke="#cbd5e1" stroke-width="1" stroke-dasharray="3,2"/>' +
+
+                // 柱2：气象误差（下降）
+                '<rect x="170" y="80" width="70" height="120" fill="#f59e0b" opacity="0.85"/>' +
+                '<text x="205" y="215" font-size="11" fill="#475569" text-anchor="middle">气象误差</text>' +
+                '<text x="205" y="74" font-size="10" fill="#b45309" text-anchor="middle" font-weight="bold">45%</text>' +
+
+                '<line x1="240" y1="80" x2="260" y2="120" stroke="#cbd5e1" stroke-width="1" stroke-dasharray="3,2"/>' +
+
+                // 柱3：模型残差（再降）
+                '<rect x="260" y="120" width="70" height="80" fill="#3b82f6" opacity="0.85"/>' +
+                '<text x="295" y="215" font-size="11" fill="#475569" text-anchor="middle">模型残差</text>' +
+                '<text x="295" y="114" font-size="10" fill="#1d4ed8" text-anchor="middle" font-weight="bold">30%</text>' +
+
+                '<line x1="330" y1="120" x2="350" y2="160" stroke="#cbd5e1" stroke-width="1" stroke-dasharray="3,2"/>' +
+
+                // 柱4：数据噪声
+                '<rect x="350" y="160" width="70" height="40" fill="#10b981" opacity="0.85"/>' +
+                '<text x="385" y="215" font-size="11" fill="#475569" text-anchor="middle">数据噪声</text>' +
+                '<text x="385" y="154" font-size="10" fill="#047857" text-anchor="middle" font-weight="bold">15%</text>' +
+
+                '<line x1="420" y1="160" x2="440" y2="180" stroke="#cbd5e1" stroke-width="1" stroke-dasharray="3,2"/>' +
+
+                // 柱5：剩余（不可解释）
+                '<rect x="440" y="180" width="70" height="20" fill="#94a3b8" opacity="0.85"/>' +
+                '<text x="475" y="215" font-size="11" fill="#475569" text-anchor="middle">剩余</text>' +
+                '<text x="475" y="174" font-size="10" fill="#64748b" text-anchor="middle" font-weight="bold">10%</text>' +
+
+                // 闭环反馈箭头
+                '<path d="M475,180 Q300,240 115,200" fill="none" stroke="#8a1c52" stroke-width="1.5" stroke-dasharray="4,3"/>' +
+                '<polygon points="115,200 123,196 122,204" fill="#8a1c52"/>' +
+                '<text x="295" y="234" font-size="9" fill="#8a1c52" text-anchor="middle">闭环反馈 → 重规划</text>' +
+                '</svg>',
+                '输入：预测偏差 　→　逐层归因 　→　输出：误差来源报告 + 反馈重构'
+            );
+        }
+    </script>
+</body>
+
+</html>
