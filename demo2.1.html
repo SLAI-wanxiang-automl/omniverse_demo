@@ -180,12 +180,95 @@
         #panel-input {
             top: 120px;
             left: 0px;
-            width: 100px;
+            width: 120px;
             border-color: var(--input-border);
         }
 
         #panel-input .side-title {
             color: var(--input-border);
+        }
+
+        .weather-source-entry {
+            position: relative;
+            width: 94px;
+            appearance: none;
+            font: inherit;
+            cursor: pointer;
+            border-color: rgba(138, 28, 82, 0.38);
+            background: linear-gradient(155deg, #ffffff 0%, #fdf2f8 100%);
+            box-shadow: 0 5px 14px rgba(138, 28, 82, 0.08);
+            transition: transform 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease;
+        }
+
+        .weather-source-entry:hover,
+        .weather-source-entry:focus-visible {
+            transform: translateY(-2px);
+            border-color: var(--primary-color);
+            box-shadow: 0 8px 18px rgba(138, 28, 82, 0.16);
+            outline: none;
+        }
+
+        .weather-source-entry::after {
+            content: '点击查看';
+            position: absolute;
+            right: -8px;
+            top: -8px;
+            padding: 2px 5px;
+            border-radius: 999px;
+            background: var(--primary-color);
+            color: #fff;
+            font-size: 0.52rem;
+            font-weight: 700;
+            letter-spacing: 0.02em;
+        }
+
+        .weather-source-label {
+            margin-top: 6px;
+            padding-top: 6px;
+            border-top: 1px dashed rgba(138, 28, 82, 0.28);
+            color: var(--primary-color);
+            line-height: 1.15;
+        }
+
+        .weather-source-label span,
+        .weather-source-label small,
+        .weather-source-label strong {
+            display: block;
+        }
+
+        .weather-source-label span {
+            margin-bottom: 2px;
+            color: var(--text-muted);
+            font-size: 0.56rem;
+            font-weight: 700;
+        }
+
+        .weather-source-label strong {
+            font-size: 0.66rem;
+            letter-spacing: 0.02em;
+        }
+
+        .weather-source-label small {
+            margin-top: 2px;
+            font-size: 0.54rem;
+            font-weight: 700;
+        }
+
+        .weather-live-dot {
+            position: absolute;
+            left: 7px;
+            top: 7px;
+            width: 7px;
+            height: 7px;
+            border-radius: 50%;
+            background: #10b981;
+            box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.45);
+            animation: weatherSourcePulse 1.8s ease-out infinite;
+        }
+
+        @keyframes weatherSourcePulse {
+            70% { box-shadow: 0 0 0 6px rgba(16, 185, 129, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(16, 185, 129, 0); }
         }
 
         .icon-p {
@@ -402,8 +485,8 @@
         /* 线条具体定位 */
         #line0 {
             top: 285px;
-            left: 100px;
-            width: 60px;
+            left: 120px;
+            width: 40px;
             height: 3px;
         }
 
@@ -1723,11 +1806,456 @@
             to { opacity: 1; transform: translateY(0) scale(1); }
         }
 
+        /* ================= 明月•万象多模态微气象站 ================= */
+        .weather-station-demo {
+            --weather-accent: #0f766e;
+        }
+
+        .weather-station-stage {
+            display: grid;
+            grid-template-columns: minmax(240px, 0.95fr) minmax(210px, 0.78fr) minmax(290px, 1.08fr);
+            gap: 14px;
+            align-items: stretch;
+        }
+
+        .weather-station-panel {
+            position: relative;
+            overflow: hidden;
+            border: 1px solid var(--border-color);
+            border-radius: 14px;
+            background: #fff;
+            box-shadow: 0 8px 24px rgba(15, 23, 42, 0.06);
+        }
+
+        .weather-station-panel h4 {
+            margin: 0;
+            color: var(--text-main);
+            font-size: 0.96rem;
+        }
+
+        .weather-device-panel,
+        .weather-output-panel {
+            padding: 14px;
+        }
+
+        .weather-device-head,
+        .weather-output-head,
+        .weather-quality-row,
+        .weather-target-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 10px;
+        }
+
+        .weather-online-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            border-radius: 999px;
+            background: #ecfdf5;
+            color: #047857;
+            padding: 4px 8px;
+            font-size: 0.68rem;
+            font-weight: 800;
+        }
+
+        .weather-online-badge::before {
+            content: '';
+            width: 7px;
+            height: 7px;
+            border-radius: 50%;
+            background: #10b981;
+            animation: weatherSourcePulse 1.8s ease-out infinite;
+        }
+
+        .weather-station-visual {
+            position: relative;
+            height: 170px;
+            margin: 10px 0;
+            border-radius: 12px;
+            background: linear-gradient(180deg, #e0f2fe 0%, #f0fdfa 62%, #ecfccb 62%, #f7fee7 100%);
+            overflow: hidden;
+        }
+
+        .weather-station-visual::before,
+        .weather-station-visual::after {
+            content: '';
+            position: absolute;
+            border-radius: 999px;
+            background: rgba(255, 255, 255, 0.82);
+        }
+
+        .weather-station-visual::before {
+            width: 72px;
+            height: 24px;
+            left: 22px;
+            top: 24px;
+            box-shadow: 35px -8px 0 -4px rgba(255, 255, 255, 0.82);
+            animation: weatherCloudDrift 8s ease-in-out infinite alternate;
+        }
+
+        .weather-station-visual::after {
+            width: 42px;
+            height: 16px;
+            right: 22px;
+            top: 48px;
+            opacity: 0.75;
+        }
+
+        @keyframes weatherCloudDrift {
+            from { transform: translateX(-8px); }
+            to { transform: translateX(18px); }
+        }
+
+        .weather-mast {
+            position: absolute;
+            z-index: 2;
+            left: 50%;
+            bottom: 20px;
+            width: 6px;
+            height: 108px;
+            border-radius: 999px;
+            background: #64748b;
+            transform: translateX(-50%);
+        }
+
+        .weather-mast::after {
+            content: '';
+            position: absolute;
+            left: 50%;
+            bottom: -5px;
+            width: 72px;
+            height: 9px;
+            border-radius: 999px;
+            background: #475569;
+            transform: translateX(-50%);
+        }
+
+        .weather-sensor-hub,
+        .weather-camera,
+        .weather-rain-gauge,
+        .weather-radiation-sensor {
+            position: absolute;
+            z-index: 3;
+            filter: drop-shadow(0 3px 4px rgba(15, 23, 42, 0.16));
+        }
+
+        .weather-sensor-hub {
+            left: calc(50% - 32px);
+            bottom: 112px;
+            font-size: 2rem;
+            animation: weatherHubFloat 2.4s ease-in-out infinite;
+        }
+
+        @keyframes weatherHubFloat {
+            50% { transform: translateY(-3px); }
+        }
+
+        .weather-camera {
+            left: calc(50% + 4px);
+            bottom: 80px;
+            font-size: 1.35rem;
+        }
+
+        .weather-rain-gauge {
+            left: calc(50% - 48px);
+            bottom: 50px;
+            font-size: 1.25rem;
+        }
+
+        .weather-radiation-sensor {
+            left: calc(50% + 18px);
+            bottom: 32px;
+            font-size: 1.35rem;
+        }
+
+        .weather-sensor-grid {
+            display: grid;
+            grid-template-columns: repeat(3, minmax(0, 1fr));
+            gap: 6px;
+        }
+
+        .weather-sensor-chip {
+            border-radius: 8px;
+            background: #f8fafc;
+            border: 1px solid #e2e8f0;
+            padding: 6px 4px;
+            color: #475569;
+            text-align: center;
+            font-size: 0.68rem;
+            font-weight: 700;
+        }
+
+        .weather-flow-panel {
+            padding: 14px 12px;
+            background: linear-gradient(180deg, #fff 0%, #f8fafc 100%);
+        }
+
+        .weather-flow-caption {
+            margin-top: 3px;
+            color: var(--text-muted);
+            font-size: 0.7rem;
+        }
+
+        .weather-flow-rail {
+            position: relative;
+            display: grid;
+            gap: 9px;
+            margin-top: 13px;
+            padding-left: 22px;
+        }
+
+        .weather-flow-rail::before {
+            content: '';
+            position: absolute;
+            left: 8px;
+            top: 12px;
+            bottom: 12px;
+            width: 2px;
+            background: linear-gradient(180deg, #0ea5e9, #10b981, #8a1c52);
+        }
+
+        .weather-flow-packet {
+            position: absolute;
+            z-index: 2;
+            left: 4px;
+            top: 9px;
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            background: #fff;
+            border: 2px solid var(--primary-color);
+            box-shadow: 0 0 0 4px rgba(138, 28, 82, 0.08);
+            animation: weatherPacketFlow 3.2s linear infinite;
+        }
+
+        .weather-flow-packet.packet-two {
+            animation-delay: -1.6s;
+        }
+
+        @keyframes weatherPacketFlow {
+            from { transform: translateY(0); opacity: 0; }
+            10%, 90% { opacity: 1; }
+            to { transform: translateY(184px); opacity: 0; }
+        }
+
+        .weather-process-step {
+            position: relative;
+            border: 1px solid #e2e8f0;
+            border-radius: 10px;
+            background: #fff;
+            padding: 9px 10px;
+            box-shadow: 0 4px 12px rgba(15, 23, 42, 0.04);
+        }
+
+        .weather-process-step strong,
+        .weather-process-step span {
+            display: block;
+        }
+
+        .weather-process-step strong {
+            color: #334155;
+            font-size: 0.76rem;
+        }
+
+        .weather-process-step span {
+            margin-top: 2px;
+            color: #64748b;
+            font-size: 0.66rem;
+            line-height: 1.35;
+        }
+
+        .weather-output-head small {
+            color: #64748b;
+            font-size: 0.68rem;
+        }
+
+        .weather-state-banner {
+            margin: 11px 0 9px;
+            border-radius: 10px;
+            background: linear-gradient(135deg, #fdf2f8, #fff7ed);
+            border: 1px solid rgba(138, 28, 82, 0.18);
+            padding: 10px 11px;
+        }
+
+        .weather-state-banner span,
+        .weather-state-banner strong,
+        .weather-state-banner small {
+            display: block;
+        }
+
+        .weather-state-banner span {
+            color: #64748b;
+            font-size: 0.66rem;
+            font-weight: 700;
+        }
+
+        .weather-state-banner strong {
+            margin: 2px 0;
+            color: var(--primary-color);
+            font-size: 1rem;
+        }
+
+        .weather-state-banner small {
+            color: #475569;
+            font-size: 0.69rem;
+        }
+
+        .weather-metric-grid {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 7px;
+        }
+
+        .weather-metric-card {
+            border: 1px solid #e2e8f0;
+            border-radius: 9px;
+            background: #f8fafc;
+            padding: 8px;
+        }
+
+        .weather-metric-card span,
+        .weather-metric-card strong {
+            display: block;
+        }
+
+        .weather-metric-card span {
+            color: #64748b;
+            font-size: 0.65rem;
+        }
+
+        .weather-metric-card strong {
+            margin-top: 2px;
+            color: #0f172a;
+            font-size: 0.88rem;
+            font-variant-numeric: tabular-nums;
+        }
+
+        .weather-station-demo.is-updating .weather-state-banner,
+        .weather-station-demo.is-updating .weather-metric-card strong {
+            animation: weatherValueRefresh 0.45s ease both;
+        }
+
+        @keyframes weatherValueRefresh {
+            from { opacity: 0.35; transform: translateY(4px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .weather-quality-card {
+            margin-top: 8px;
+            border-radius: 9px;
+            border: 1px solid #bbf7d0;
+            background: #ecfdf5;
+            padding: 8px 9px;
+            color: #047857;
+        }
+
+        .weather-quality-card strong {
+            font-size: 0.78rem;
+        }
+
+        .weather-quality-card small {
+            color: #047857;
+            font-size: 0.64rem;
+        }
+
+        .weather-target-row {
+            margin-top: 14px;
+            border: 1px solid rgba(138, 28, 82, 0.22);
+            border-radius: 12px;
+            background: #fff;
+            padding: 10px 12px;
+        }
+
+        .weather-target-copy span,
+        .weather-target-copy strong,
+        .weather-target-copy small {
+            display: block;
+        }
+
+        .weather-target-copy span {
+            color: #64748b;
+            font-size: 0.64rem;
+            font-weight: 700;
+        }
+
+        .weather-target-copy strong {
+            color: var(--primary-color);
+            font-size: 0.86rem;
+        }
+
+        .weather-target-copy small {
+            color: #64748b;
+            font-size: 0.63rem;
+        }
+
+        .weather-target-arrow {
+            position: relative;
+            width: 92px;
+            height: 2px;
+            flex: 0 0 92px;
+            background: linear-gradient(90deg, #10b981, var(--primary-color));
+            overflow: visible;
+        }
+
+        .weather-target-arrow::after {
+            content: '';
+            position: absolute;
+            right: -1px;
+            top: -4px;
+            border-width: 5px 0 5px 8px;
+            border-style: solid;
+            border-color: transparent transparent transparent var(--primary-color);
+        }
+
+        .weather-target-arrow i {
+            position: absolute;
+            left: 0;
+            top: -3px;
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: #fff;
+            border: 2px solid #10b981;
+            animation: weatherTargetFlow 1.8s linear infinite;
+        }
+
+        @keyframes weatherTargetFlow {
+            to { transform: translateX(80px); border-color: var(--primary-color); }
+        }
+
+        .weather-variable-target {
+            min-width: 160px;
+            border-radius: 9px;
+            background: #fdf2f8;
+            border: 1px solid rgba(138, 28, 82, 0.2);
+            padding: 8px 10px;
+            text-align: center;
+        }
+
+        .weather-variable-target strong,
+        .weather-variable-target small {
+            display: block;
+        }
+
+        .weather-variable-target strong {
+            color: var(--primary-color);
+            font-size: 0.78rem;
+        }
+
+        .weather-variable-target small {
+            margin-top: 2px;
+            color: #64748b;
+            font-size: 0.61rem;
+        }
+
         @media (max-width: 820px) {
             .automl-stage,
             .governance-flow,
             .prediction-flow,
-            .diagnosis-flow {
+            .diagnosis-flow,
+            .weather-station-stage {
                 grid-template-columns: 1fr;
             }
             .governance-stage { grid-template-columns: 1fr; }
@@ -1739,6 +2267,14 @@
             .route-particle { display: none; }
             .modal-content { padding: 20px; }
             .modal-visual { min-height: 0; }
+            .weather-target-row { align-items: stretch; flex-direction: column; }
+            .weather-target-arrow { width: 2px; height: 38px; flex-basis: 38px; margin-left: 50%; }
+            .weather-target-arrow::after { right: -4px; top: auto; bottom: -1px; border-width: 8px 5px 0; border-color: var(--primary-color) transparent transparent; }
+            .weather-target-arrow i { left: -3px; top: 0; animation-name: weatherTargetFlowMobile; }
+        }
+
+        @keyframes weatherTargetFlowMobile {
+            to { transform: translateY(28px); border-color: var(--primary-color); }
         }
 
         @media (max-width: 520px) {
@@ -1781,10 +2317,16 @@
                         <div class="side-icon">📈</div>
                         <div class="side-text">时序数据</div>
                     </div>
-                    <div class="side-item">
+                    <button class="side-item weather-source-entry" type="button" onclick="openModule('weather')" aria-label="查看明月•万象多模态微气象站详情">
+                        <span class="weather-live-dot" aria-hidden="true"></span>
                         <div class="side-icon">🌦️</div>
                         <div class="side-text">外生变量</div>
-                    </div>
+                        <div class="weather-source-label">
+                            <span>数据来源</span>
+                            <strong>明月•万象</strong>
+                            <small>多模态微气象站</small>
+                        </div>
+                    </button>
                     <div class="side-item" style="margin-bottom: 0;">
                         <div class="icon-p">P</div>
                         <div class="side-text">任务目标</div>
@@ -1928,6 +2470,11 @@
     <script>
         // 模块弹窗业务数据
         const modulesData = {
+            'weather': {
+                title: "明月•万象多模态微气象站",
+                value: "本设备在新能源场站现场持续采集温湿度、风速风向、辐照、雨量与图像等多模态气象信息，输出带时间戳、天气状态和质量标记的局地气象数据。解决通用气象数据空间分辨率不足、更新不及时、难以及时感知场站局地天气突变的问题。",
+                visual: renderWeatherStationLab
+            },
             'data': {
                 title: "数据治理 Agent",
                 value: "本模块自动清洗海量杂乱时序数据，并依据外生变量通过物理规律进行异常值检测，输出清洗后的数据集和数据质量报告。解决新能源设备数据质量差、可用性低的难题。",
@@ -1988,6 +2535,10 @@
         }
         function closeModule() {
             document.getElementById('module-modal').classList.remove('active');
+            if (weatherStationTimer) {
+                window.clearInterval(weatherStationTimer);
+                weatherStationTimer = null;
+            }
         }
 
         // 滚动到场景入口区
@@ -2038,6 +2589,7 @@
            ======================================================== */
 
         function initModuleLab(modId) {
+            if (modId === 'weather') initWeatherStationLab();
             if (modId === 'data') initDataLab();
             if (modId === 'automl') initAutoMLLab();
             if (modId === 'predict') initPredictionAgentDemo(document.getElementById('mod-visual'));
@@ -2050,6 +2602,217 @@
             root.classList.remove(animationClass);
             void root.offsetWidth;
             root.classList.add(animationClass);
+        }
+
+        let weatherStationTimer = null;
+
+        function renderWeatherStationLab() {
+            return `
+                <div class="module-lab weather-station-demo" id="weather-station-lab">
+                    <div class="lab-toolbar">
+                        <div>
+                            <div class="lab-kicker">On-site Multimodal Weather Sensing</div>
+                            <strong>切换现场天气，观察微气象数据如何形成外生变量</strong>
+                        </div>
+                        <div class="lab-presets" role="group" aria-label="现场天气状态">
+                            <button class="lab-preset active" type="button" data-weather-case="normal">正常观测</button>
+                            <button class="lab-preset" type="button" data-weather-case="cloud">云团遮挡</button>
+                            <button class="lab-preset" type="button" data-weather-case="gust">阵风到达</button>
+                            <button class="lab-preset" type="button" data-weather-case="rain">降雨开始</button>
+                        </div>
+                    </div>
+
+                    <div class="weather-station-stage">
+                        <section class="weather-station-panel weather-device-panel">
+                            <div class="weather-device-head">
+                                <h4>场站现场感知节点</h4>
+                                <span class="weather-online-badge">节点 A 在线</span>
+                            </div>
+                            <div class="weather-station-visual" aria-label="多模态微气象站示意">
+                                <div class="weather-mast"></div>
+                                <div class="weather-sensor-hub" title="风速风向传感器">📡</div>
+                                <div class="weather-camera" title="工业摄像头">📷</div>
+                                <div class="weather-rain-gauge" title="雨量传感器">🌧️</div>
+                                <div class="weather-radiation-sensor" title="辐照传感器">☀️</div>
+                            </div>
+                            <div class="weather-sensor-grid" aria-label="已接入的多模态观测">
+                                <div class="weather-sensor-chip">🌡️ 温湿度</div>
+                                <div class="weather-sensor-chip">💨 风速风向</div>
+                                <div class="weather-sensor-chip">☀️ 辐照</div>
+                                <div class="weather-sensor-chip">🌧️ 雨量</div>
+                                <div class="weather-sensor-chip">📷 图像</div>
+                                <div class="weather-sensor-chip">⏱️ 2 秒更新</div>
+                            </div>
+                        </section>
+
+                        <section class="weather-station-panel weather-flow-panel">
+                            <h4>现场数据形成过程</h4>
+                            <div class="weather-flow-caption">观测数据持续汇聚并形成统一记录</div>
+                            <div class="weather-flow-rail">
+                                <i class="weather-flow-packet"></i>
+                                <i class="weather-flow-packet packet-two"></i>
+                                <div class="weather-process-step">
+                                    <strong>① 多模态现场采集</strong>
+                                    <span>同步获取传感器数值与现场图像</span>
+                                </div>
+                                <div class="weather-process-step">
+                                    <strong>② 时间与位置对齐</strong>
+                                    <span>统一场站、节点和观测时间</span>
+                                </div>
+                                <div class="weather-process-step">
+                                    <strong>③ 天气状态识别</strong>
+                                    <span>记录云团、阵风、降雨等现场变化</span>
+                                </div>
+                                <div class="weather-process-step">
+                                    <strong>④ 质量状态标记</strong>
+                                    <span>区分真实天气事件与数据异常</span>
+                                </div>
+                            </div>
+                        </section>
+
+                        <section class="weather-station-panel weather-output-panel" aria-live="polite">
+                            <div class="weather-output-head">
+                                <h4>实时微气象数据</h4>
+                                <small data-weather-updated>刚刚更新</small>
+                            </div>
+                            <div class="weather-state-banner">
+                                <span>现场天气状态</span>
+                                <strong data-weather-state>晴间多云</strong>
+                                <small data-weather-description>各项观测平稳，现场数据持续有效</small>
+                            </div>
+                            <div class="weather-metric-grid">
+                                <div class="weather-metric-card"><span>温度</span><strong data-weather-value="temperature">23.6 °C</strong></div>
+                                <div class="weather-metric-card"><span>湿度</span><strong data-weather-value="humidity">62.0 %</strong></div>
+                                <div class="weather-metric-card"><span>风速</span><strong data-weather-value="wind">3.4 m/s</strong></div>
+                                <div class="weather-metric-card"><span>辐照度</span><strong data-weather-value="radiation">586 W/m²</strong></div>
+                            </div>
+                            <div class="weather-quality-card">
+                                <div class="weather-quality-row">
+                                    <strong data-weather-quality>数据质量 A · 有效</strong>
+                                    <small data-weather-rain>雨量 0.0 mm</small>
+                                </div>
+                                <small data-weather-camera>图像状态：视野清晰</small>
+                            </div>
+                        </section>
+                    </div>
+
+                    <div class="weather-target-row">
+                        <div class="weather-target-copy">
+                            <span>微气象站输出</span>
+                            <strong>带时间戳、天气状态与质量标记的局地观测</strong>
+                            <small>真实天气突变不等于数据质量异常</small>
+                        </div>
+                        <div class="weather-target-arrow" aria-hidden="true"><i></i></div>
+                        <div class="weather-variable-target">
+                            <strong>🌦️ 已接入：外生变量</strong>
+                            <small>为后续数据治理与预测提供现场依据</small>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        function initWeatherStationLab() {
+            const root = document.getElementById('weather-station-lab');
+            if (!root) return;
+
+            const cases = {
+                normal: {
+                    state: '晴间多云',
+                    description: '各项观测平稳，现场数据持续有效',
+                    temperature: 23.6,
+                    humidity: 62.0,
+                    wind: 3.4,
+                    radiation: 586,
+                    rain: 0.0,
+                    camera: '图像状态：视野清晰'
+                },
+                cloud: {
+                    state: '云团遮挡',
+                    description: '辐照快速下降，现场观测仍为有效数据',
+                    temperature: 23.4,
+                    humidity: 65.0,
+                    wind: 4.1,
+                    radiation: 268,
+                    rain: 0.0,
+                    camera: '图像状态：云团进入场站上空'
+                },
+                gust: {
+                    state: '阵风到达',
+                    description: '风速短时升高，现场观测仍为有效数据',
+                    temperature: 22.9,
+                    humidity: 68.0,
+                    wind: 12.8,
+                    radiation: 541,
+                    rain: 0.0,
+                    camera: '图像状态：植被摆动明显'
+                },
+                rain: {
+                    state: '降雨开始',
+                    description: '雨量与图像同步确认，现场观测仍为有效数据',
+                    temperature: 21.8,
+                    humidity: 91.0,
+                    wind: 6.2,
+                    radiation: 126,
+                    rain: 3.2,
+                    camera: '图像状态：可见降雨与低云'
+                }
+            };
+
+            let activeCase = 'normal';
+            let tick = 0;
+
+            function setText(selector, value) {
+                const target = root.querySelector(selector);
+                if (target) target.textContent = value;
+            }
+
+            function refreshValues(animate) {
+                const current = cases[activeCase];
+                const wave = Math.sin(tick * 0.82);
+                const temperature = current.temperature + wave * 0.08;
+                const humidity = current.humidity + wave * 0.35;
+                const wind = Math.max(0, current.wind + wave * (activeCase === 'gust' ? 0.35 : 0.12));
+                const radiation = Math.max(0, current.radiation + Math.round(wave * (activeCase === 'cloud' ? 8 : 4)));
+
+                setText('[data-weather-state]', current.state);
+                setText('[data-weather-description]', current.description);
+                setText('[data-weather-value="temperature"]', temperature.toFixed(1) + ' °C');
+                setText('[data-weather-value="humidity"]', humidity.toFixed(1) + ' %');
+                setText('[data-weather-value="wind"]', wind.toFixed(1) + ' m/s');
+                setText('[data-weather-value="radiation"]', Math.round(radiation) + ' W/m²');
+                setText('[data-weather-rain]', '雨量 ' + current.rain.toFixed(1) + ' mm');
+                setText('[data-weather-camera]', current.camera);
+                setText('[data-weather-quality]', '数据质量 A · 有效');
+                setText('[data-weather-updated]', new Date().toLocaleTimeString('zh-CN', { hour12: false }) + ' 更新');
+
+                if (animate) {
+                    root.classList.remove('is-updating');
+                    void root.offsetWidth;
+                    root.classList.add('is-updating');
+                }
+                tick += 1;
+            }
+
+            function showCase(caseId) {
+                activeCase = caseId;
+                root.querySelectorAll('[data-weather-case]').forEach(function (button) {
+                    button.classList.toggle('active', button.dataset.weatherCase === caseId);
+                });
+                refreshValues(true);
+            }
+
+            root.querySelectorAll('[data-weather-case]').forEach(function (button) {
+                button.addEventListener('click', function () {
+                    showCase(button.dataset.weatherCase);
+                });
+            });
+
+            showCase('normal');
+            if (weatherStationTimer) window.clearInterval(weatherStationTimer);
+            weatherStationTimer = window.setInterval(function () {
+                refreshValues(false);
+            }, 1100);
         }
 
         function renderDataLab() {
