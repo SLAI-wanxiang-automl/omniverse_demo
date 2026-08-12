@@ -2472,7 +2472,7 @@
         const modulesData = {
             'weather': {
                 title: "明月•万象多模态微气象站",
-                value: "本设备在新能源场站现场持续采集温湿度、风速风向、辐照、雨量与图像等多模态气象信息，输出带时间戳、天气状态和质量标记的局地气象数据。解决通用气象数据空间分辨率不足、更新不及时、难以及时感知场站局地天气突变的问题。",
+                value: "本原型面向新能源场站局地气象感知，已实现单节点多接口数据接入，可采集温湿度、风速风向、辐照、雨量、土壤温湿度、气压、颗粒物、音频与图像等多模态信息，并形成带时间戳、位置和数据状态的统一记录，为系统提供局地外生变量输入。用于缓解通用气象数据空间分辨率不足、更新不及时的问题。",
                 visual: renderWeatherStationLab
             },
             'data': {
@@ -2612,21 +2612,21 @@
                     <div class="lab-toolbar">
                         <div>
                             <div class="lab-kicker">On-site Multimodal Weather Sensing</div>
-                            <strong>切换现场天气，观察微气象数据如何形成外生变量</strong>
+                            <strong>切换演示状态，观察单节点数据如何形成外生变量</strong>
                         </div>
-                        <div class="lab-presets" role="group" aria-label="现场天气状态">
+                        <div class="lab-presets" role="group" aria-label="原型演示状态">
                             <button class="lab-preset active" type="button" data-weather-case="normal">正常观测</button>
-                            <button class="lab-preset" type="button" data-weather-case="cloud">云团遮挡</button>
-                            <button class="lab-preset" type="button" data-weather-case="gust">阵风到达</button>
-                            <button class="lab-preset" type="button" data-weather-case="rain">降雨开始</button>
+                            <button class="lab-preset" type="button" data-weather-case="lowRadiation">低辐照</button>
+                            <button class="lab-preset" type="button" data-weather-case="soilDry">土壤干燥</button>
+                            <button class="lab-preset" type="button" data-weather-case="rain">降雨状态</button>
                         </div>
                     </div>
 
                     <div class="weather-station-stage">
                         <section class="weather-station-panel weather-device-panel">
                             <div class="weather-device-head">
-                                <h4>场站现场感知节点</h4>
-                                <span class="weather-online-badge">节点 A 在线</span>
+                                <h4>单节点感知原型</h4>
+                                <span class="weather-online-badge">演示节点运行中 · 2 秒采样</span>
                             </div>
                             <div class="weather-station-visual" aria-label="多模态微气象站示意">
                                 <div class="weather-mast"></div>
@@ -2635,63 +2635,68 @@
                                 <div class="weather-rain-gauge" title="雨量传感器">🌧️</div>
                                 <div class="weather-radiation-sensor" title="辐照传感器">☀️</div>
                             </div>
-                            <div class="weather-sensor-grid" aria-label="已接入的多模态观测">
+                            <div class="weather-sensor-grid" aria-label="已接入的代表性观测模态">
                                 <div class="weather-sensor-chip">🌡️ 温湿度</div>
                                 <div class="weather-sensor-chip">💨 风速风向</div>
                                 <div class="weather-sensor-chip">☀️ 辐照</div>
                                 <div class="weather-sensor-chip">🌧️ 雨量</div>
-                                <div class="weather-sensor-chip">📷 图像</div>
-                                <div class="weather-sensor-chip">⏱️ 2 秒更新</div>
+                                <div class="weather-sensor-chip">🌱 土壤温湿度</div>
+                                <div class="weather-sensor-chip">🧭 气压</div>
+                                <div class="weather-sensor-chip">🌫️ 颗粒物</div>
+                                <div class="weather-sensor-chip">🎙️ 环境音频</div>
+                                <div class="weather-sensor-chip">📷 图像 / 视频</div>
                             </div>
                         </section>
 
                         <section class="weather-station-panel weather-flow-panel">
-                            <h4>现场数据形成过程</h4>
-                            <div class="weather-flow-caption">观测数据持续汇聚并形成统一记录</div>
+                            <h4>数据采集 Pipeline</h4>
+                            <div class="weather-flow-caption">演示 RS485 轮询、图像采集与统一记录过程</div>
                             <div class="weather-flow-rail">
                                 <i class="weather-flow-packet"></i>
                                 <i class="weather-flow-packet packet-two"></i>
                                 <div class="weather-process-step">
-                                    <strong>① 多模态现场采集</strong>
-                                    <span>同步获取传感器数值与现场图像</span>
+                                    <strong>① 多接口数据拉取</strong>
+                                    <span>RS485 轮询与图像采集</span>
                                 </div>
                                 <div class="weather-process-step">
-                                    <strong>② 时间与位置对齐</strong>
-                                    <span>统一场站、节点和观测时间</span>
+                                    <strong>② 读数解析与检查</strong>
+                                    <span>寄存器解析、单位换算与有效性标记</span>
                                 </div>
                                 <div class="weather-process-step">
-                                    <strong>③ 天气状态识别</strong>
-                                    <span>记录云团、阵风、降雨等现场变化</span>
+                                    <strong>③ 异构数据统一</strong>
+                                    <span>统一时间戳、位置与数据状态</span>
                                 </div>
                                 <div class="weather-process-step">
-                                    <strong>④ 质量状态标记</strong>
-                                    <span>区分真实天气事件与数据异常</span>
+                                    <strong>④ Agent 查询输入</strong>
+                                    <span>按地点、时间窗与气象变量聚合</span>
                                 </div>
                             </div>
                         </section>
 
                         <section class="weather-station-panel weather-output-panel" aria-live="polite">
                             <div class="weather-output-head">
-                                <h4>实时微气象数据</h4>
+                                <h4>单节点监测数据</h4>
                                 <small data-weather-updated>刚刚更新</small>
                             </div>
                             <div class="weather-state-banner">
-                                <span>现场天气状态</span>
-                                <strong data-weather-state>晴间多云</strong>
-                                <small data-weather-description>各项观测平稳，现场数据持续有效</small>
+                                <span>演示状态</span>
+                                <strong data-weather-state>观测正常</strong>
+                                <small data-weather-description>多传感器读数平稳，当前记录有效</small>
                             </div>
                             <div class="weather-metric-grid">
-                                <div class="weather-metric-card"><span>温度</span><strong data-weather-value="temperature">23.6 °C</strong></div>
-                                <div class="weather-metric-card"><span>湿度</span><strong data-weather-value="humidity">62.0 %</strong></div>
-                                <div class="weather-metric-card"><span>风速</span><strong data-weather-value="wind">3.4 m/s</strong></div>
-                                <div class="weather-metric-card"><span>辐照度</span><strong data-weather-value="radiation">586 W/m²</strong></div>
+                                <div class="weather-metric-card"><span>空气温度</span><strong data-weather-value="temperature">25.2 °C</strong></div>
+                                <div class="weather-metric-card"><span>相对湿度</span><strong data-weather-value="humidity">75.0 %</strong></div>
+                                <div class="weather-metric-card"><span>风速</span><strong data-weather-value="wind">0.0 m/s</strong></div>
+                                <div class="weather-metric-card"><span>总辐照</span><strong data-weather-value="radiation">2 W/m²</strong></div>
+                                <div class="weather-metric-card"><span>土壤水分</span><strong data-weather-value="soil">6.6 %</strong></div>
+                                <div class="weather-metric-card"><span>累计雨量</span><strong data-weather-value="rain">2.1 mm</strong></div>
                             </div>
                             <div class="weather-quality-card">
                                 <div class="weather-quality-row">
-                                    <strong data-weather-quality>数据质量 A · 有效</strong>
-                                    <small data-weather-rain>雨量 0.0 mm</small>
+                                    <strong data-weather-quality>有效性标记：有效</strong>
+                                    <small data-weather-status>数据状态：正常</small>
                                 </div>
-                                <small data-weather-camera>图像状态：视野清晰</small>
+                                <small data-weather-camera>图像通道：可用</small>
                             </div>
                         </section>
                     </div>
@@ -2699,8 +2704,8 @@
                     <div class="weather-target-row">
                         <div class="weather-target-copy">
                             <span>微气象站输出</span>
-                            <strong>带时间戳、天气状态与质量标记的局地观测</strong>
-                            <small>真实天气突变不等于数据质量异常</small>
+                            <strong>带时间戳、位置与数据状态的统一记录</strong>
+                            <small>天气状态与数据有效性分别记录</small>
                         </div>
                         <div class="weather-target-arrow" aria-hidden="true"><i></i></div>
                         <div class="weather-variable-target">
@@ -2718,44 +2723,52 @@
 
             const cases = {
                 normal: {
-                    state: '晴间多云',
-                    description: '各项观测平稳，现场数据持续有效',
-                    temperature: 23.6,
-                    humidity: 62.0,
-                    wind: 3.4,
-                    radiation: 586,
-                    rain: 0.0,
-                    camera: '图像状态：视野清晰'
+                    state: '观测正常',
+                    description: '多传感器读数平稳，当前记录有效',
+                    temperature: 25.2,
+                    humidity: 75.0,
+                    wind: 0.0,
+                    radiation: 2,
+                    soil: 6.6,
+                    rain: 2.1,
+                    status: '数据状态：正常',
+                    camera: '图像通道：可用'
                 },
-                cloud: {
-                    state: '云团遮挡',
-                    description: '辐照快速下降，现场观测仍为有效数据',
-                    temperature: 23.4,
-                    humidity: 65.0,
-                    wind: 4.1,
-                    radiation: 268,
-                    rain: 0.0,
-                    camera: '图像状态：云团进入场站上空'
+                lowRadiation: {
+                    state: '低辐照',
+                    description: '辐照读数低于演示阈值，当前记录仍有效',
+                    temperature: 24.8,
+                    humidity: 76.2,
+                    wind: 0.2,
+                    radiation: 1,
+                    soil: 6.7,
+                    rain: 2.1,
+                    status: '数据状态：低辐照',
+                    camera: '图像通道：可用'
                 },
-                gust: {
-                    state: '阵风到达',
-                    description: '风速短时升高，现场观测仍为有效数据',
-                    temperature: 22.9,
-                    humidity: 68.0,
-                    wind: 12.8,
-                    radiation: 541,
-                    rain: 0.0,
-                    camera: '图像状态：植被摆动明显'
+                soilDry: {
+                    state: '土壤干燥',
+                    description: '土壤水分低于演示阈值，当前记录仍有效',
+                    temperature: 25.5,
+                    humidity: 71.8,
+                    wind: 0.1,
+                    radiation: 3,
+                    soil: 5.8,
+                    rain: 2.1,
+                    status: '数据状态：土壤干燥',
+                    camera: '图像通道：可用'
                 },
                 rain: {
-                    state: '降雨开始',
-                    description: '雨量与图像同步确认，现场观测仍为有效数据',
-                    temperature: 21.8,
-                    humidity: 91.0,
-                    wind: 6.2,
-                    radiation: 126,
+                    state: '降雨状态',
+                    description: '雨量传感器记录累计雨量变化，图像通道仅作辅助',
+                    temperature: 24.1,
+                    humidity: 89.0,
+                    wind: 0.4,
+                    radiation: 1,
+                    soil: 7.4,
                     rain: 3.2,
-                    camera: '图像状态：可见降雨与低云'
+                    status: '数据状态：降雨中',
+                    camera: '图像通道：辅助观测'
                 }
             };
 
@@ -2772,18 +2785,22 @@
                 const wave = Math.sin(tick * 0.82);
                 const temperature = current.temperature + wave * 0.08;
                 const humidity = current.humidity + wave * 0.35;
-                const wind = Math.max(0, current.wind + wave * (activeCase === 'gust' ? 0.35 : 0.12));
-                const radiation = Math.max(0, current.radiation + Math.round(wave * (activeCase === 'cloud' ? 8 : 4)));
+                const wind = Math.max(0, current.wind + wave * 0.08);
+                const radiation = Math.max(0, current.radiation + wave * 0.18);
+                const soil = Math.max(0, current.soil + wave * 0.04);
+                const rain = Math.max(0, current.rain + (activeCase === 'rain' ? Math.max(0, wave) * 0.08 : 0));
 
                 setText('[data-weather-state]', current.state);
                 setText('[data-weather-description]', current.description);
                 setText('[data-weather-value="temperature"]', temperature.toFixed(1) + ' °C');
                 setText('[data-weather-value="humidity"]', humidity.toFixed(1) + ' %');
                 setText('[data-weather-value="wind"]', wind.toFixed(1) + ' m/s');
-                setText('[data-weather-value="radiation"]', Math.round(radiation) + ' W/m²');
-                setText('[data-weather-rain]', '雨量 ' + current.rain.toFixed(1) + ' mm');
+                setText('[data-weather-value="radiation"]', radiation.toFixed(1) + ' W/m²');
+                setText('[data-weather-value="soil"]', soil.toFixed(1) + ' %');
+                setText('[data-weather-value="rain"]', rain.toFixed(1) + ' mm');
+                setText('[data-weather-status]', current.status);
                 setText('[data-weather-camera]', current.camera);
-                setText('[data-weather-quality]', '数据质量 A · 有效');
+                setText('[data-weather-quality]', '有效性标记：有效');
                 setText('[data-weather-updated]', new Date().toLocaleTimeString('zh-CN', { hour12: false }) + ' 更新');
 
                 if (animate) {
@@ -2812,7 +2829,7 @@
             if (weatherStationTimer) window.clearInterval(weatherStationTimer);
             weatherStationTimer = window.setInterval(function () {
                 refreshValues(false);
-            }, 1100);
+            }, 2000);
         }
 
         function renderDataLab() {
