@@ -188,9 +188,20 @@
             color: var(--input-border);
         }
 
+        #panel-input > .side-item:not(.weather-source-entry) {
+            width: 100px;
+        }
+
         .weather-source-entry {
             position: relative;
-            width: 118px;
+            display: grid;
+            grid-template-columns: 46px minmax(0, 1fr);
+            grid-template-areas:
+                "hardware heading"
+                "sources sources";
+            align-items: center;
+            column-gap: 6px;
+            width: 120px;
             appearance: none;
             font: inherit;
             cursor: pointer;
@@ -226,8 +237,9 @@
         }
 
         .weather-source-label {
-            margin-top: 8px;
-            padding-top: 7px;
+            grid-area: sources;
+            margin-top: 5px;
+            padding-top: 5px;
             border-top: 1px dashed rgba(138, 28, 82, 0.28);
             color: var(--primary-color);
             line-height: 1.15;
@@ -240,9 +252,9 @@
         }
 
         .weather-source-label span {
-            margin-bottom: 5px;
+            margin-bottom: 4px;
             color: var(--primary-color);
-            font-size: 0.62rem;
+            font-size: 0.58rem;
             font-weight: 850;
         }
 
@@ -258,11 +270,13 @@
         }
 
         .weather-source-entry .side-text {
+            grid-area: heading;
             color: var(--primary-color);
-            font-size: 0.9rem;
+            font-size: 0.76rem;
             font-weight: 900;
-            line-height: 1.22;
+            line-height: 1.25;
             letter-spacing: 0.01em;
+            text-align: left;
         }
 
         .weather-source-entry .side-icon {
@@ -271,9 +285,11 @@
         }
 
         .weather-hardware-hero {
+            grid-area: hardware;
             position: relative;
-            height: 86px;
-            margin: 5px -1px 7px;
+            width: 46px;
+            height: 58px;
+            margin: 4px 0 5px;
             overflow: hidden;
             border: 1px solid rgba(14, 116, 144, 0.18);
             border-radius: 10px;
@@ -295,31 +311,32 @@
             position: relative;
             z-index: 1;
             display: block;
-            width: 84px;
-            height: 84px;
+            width: 46px;
+            height: 56px;
             margin: 0 auto;
             object-fit: contain;
-            filter: drop-shadow(0 6px 7px rgba(15, 23, 42, 0.16));
+            filter: drop-shadow(0 4px 5px rgba(15, 23, 42, 0.16));
         }
 
         .weather-hardware-hero span {
             position: absolute;
             z-index: 2;
-            right: 5px;
-            bottom: 5px;
+            left: 50%;
+            bottom: 3px;
             border: 1px solid rgba(15, 118, 110, 0.18);
             border-radius: 999px;
             background: rgba(236, 253, 245, 0.94);
-            padding: 2px 5px;
+            padding: 1px 3px;
             color: #047857;
-            font-size: 0.47rem;
+            font-size: 0.39rem;
             font-weight: 850;
             white-space: nowrap;
+            transform: translateX(-50%);
         }
 
         .weather-source-pair {
             display: grid;
-            gap: 5px;
+            gap: 3px;
         }
 
         .weather-source-pair b {
@@ -327,9 +344,9 @@
             border: 1px solid rgba(138, 28, 82, 0.16);
             border-radius: 7px;
             background: rgba(255, 255, 255, 0.82);
-            padding: 5px 3px;
+            padding: 4px 3px;
             color: #334155;
-            font-size: 0.59rem;
+            font-size: 0.55rem;
             font-weight: 800;
             white-space: nowrap;
         }
