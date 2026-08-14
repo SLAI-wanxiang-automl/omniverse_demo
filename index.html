@@ -195,12 +195,12 @@
         .weather-source-entry {
             position: relative;
             display: grid;
-            grid-template-columns: 46px minmax(0, 1fr);
+            grid-template-columns: 42px minmax(0, 1fr);
             grid-template-areas:
                 "hardware heading"
                 "sources sources";
             align-items: center;
-            column-gap: 6px;
+            column-gap: 5px;
             width: 120px;
             appearance: none;
             font: inherit;
@@ -272,11 +272,12 @@
         .weather-source-entry .side-text {
             grid-area: heading;
             color: var(--primary-color);
-            font-size: 0.76rem;
+            font-size: 0.74rem;
             font-weight: 900;
             line-height: 1.25;
-            letter-spacing: 0.01em;
+            letter-spacing: 0;
             text-align: left;
+            white-space: nowrap;
         }
 
         .weather-source-entry .side-icon {
@@ -287,7 +288,7 @@
         .weather-hardware-hero {
             grid-area: hardware;
             position: relative;
-            width: 46px;
+            width: 42px;
             height: 58px;
             margin: 4px 0 5px;
             overflow: hidden;
@@ -311,7 +312,7 @@
             position: relative;
             z-index: 1;
             display: block;
-            width: 46px;
+            width: 42px;
             height: 56px;
             margin: 0 auto;
             object-fit: contain;
