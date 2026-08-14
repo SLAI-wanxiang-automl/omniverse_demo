@@ -1,0 +1,89 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 280 250" role="img" aria-labelledby="title desc">
+  <title id="title">多模态微气象站硬件示意</title>
+  <desc id="desc">包含风速风向、辐照、雨量、温湿度和工业相机传感器的微气象站</desc>
+  <defs>
+    <linearGradient id="mast" x1="0" x2="1">
+      <stop offset="0" stop-color="#94a3b8"/>
+      <stop offset="0.45" stop-color="#f8fafc"/>
+      <stop offset="1" stop-color="#64748b"/>
+    </linearGradient>
+    <linearGradient id="metal" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#f8fafc"/>
+      <stop offset="0.5" stop-color="#cbd5e1"/>
+      <stop offset="1" stop-color="#64748b"/>
+    </linearGradient>
+    <linearGradient id="accent" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#a92a66"/>
+      <stop offset="1" stop-color="#6b153f"/>
+    </linearGradient>
+    <radialGradient id="halo">
+      <stop offset="0" stop-color="#fce7f3" stop-opacity="0.9"/>
+      <stop offset="1" stop-color="#fdf2f8" stop-opacity="0"/>
+    </radialGradient>
+    <filter id="shadow" x="-30%" y="-30%" width="160%" height="180%">
+      <feDropShadow dx="0" dy="7" stdDeviation="6" flood-color="#0f172a" flood-opacity="0.18"/>
+    </filter>
+  </defs>
+
+  <ellipse cx="140" cy="126" rx="112" ry="108" fill="url(#halo)"/>
+  <g filter="url(#shadow)">
+    <ellipse cx="139" cy="226" rx="55" ry="9" fill="#94a3b8" opacity="0.3"/>
+    <path d="M99 219h80l-9 14h-62z" fill="#475569"/>
+    <path d="M115 207h48l13 14h-75z" fill="url(#metal)" stroke="#475569" stroke-width="2"/>
+
+    <rect x="135" y="42" width="10" height="169" rx="5" fill="url(#mast)" stroke="#475569" stroke-width="1.5"/>
+    <rect x="81" y="48" width="117" height="7" rx="3.5" fill="url(#mast)" stroke="#475569" stroke-width="1.2"/>
+
+    <!-- 风向标 -->
+    <path d="M145 34h58l-16-11v8h-42z" fill="url(#accent)" stroke="#6b153f" stroke-width="1.5"/>
+    <circle cx="143" cy="34" r="6" fill="#f8fafc" stroke="#475569" stroke-width="2"/>
+
+    <!-- 三杯风速计 -->
+    <g transform="translate(83 44)">
+      <circle cx="0" cy="0" r="5" fill="#475569"/>
+      <path d="M0 0l-20-11M0 0l20-11M0 0v23" stroke="#475569" stroke-width="3" stroke-linecap="round"/>
+      <path d="M-27-17c8-2 13 1 15 7-8 3-13 1-15-7zM12-10c2-7 7-10 15-7-2 8-7 10-15 7zM-7 23c5-6 11-6 17-1-5 7-11 7-17 1z" fill="url(#metal)" stroke="#475569" stroke-width="1.2"/>
+    </g>
+
+    <!-- 工业相机 -->
+    <g transform="translate(148 78)">
+      <path d="M0 3h35a5 5 0 015 5v19a5 5 0 01-5 5H0z" fill="#334155" stroke="#0f172a" stroke-width="1.5"/>
+      <path d="M40 9l13 5v12l-13 4z" fill="#64748b" stroke="#334155" stroke-width="1.5"/>
+      <circle cx="13" cy="17" r="8" fill="#0f172a" stroke="#cbd5e1" stroke-width="2"/>
+      <circle cx="13" cy="17" r="3.5" fill="#60a5fa"/>
+      <rect x="4" y="-4" width="23" height="7" rx="3" fill="url(#accent)"/>
+    </g>
+
+    <!-- 百叶温湿度传感器 -->
+    <g transform="translate(86 91)">
+      <rect x="0" y="0" width="37" height="53" rx="6" fill="#f8fafc" stroke="#94a3b8" stroke-width="1.5"/>
+      <path d="M5 9h27M4 16h29M4 23h29M4 30h29M5 37h27M8 44h21" stroke="#94a3b8" stroke-width="3" stroke-linecap="round"/>
+      <path d="M14 53h9v15h-9z" fill="url(#mast)"/>
+    </g>
+
+    <!-- 雨量计 -->
+    <g transform="translate(159 132)">
+      <path d="M0 0h43l-7 13H7z" fill="#e2e8f0" stroke="#64748b" stroke-width="1.5"/>
+      <rect x="8" y="13" width="27" height="37" rx="4" fill="url(#metal)" stroke="#64748b" stroke-width="1.5"/>
+      <rect x="16" y="50" width="11" height="14" fill="url(#mast)"/>
+    </g>
+
+    <!-- 辐照传感器 -->
+    <g transform="translate(63 165)">
+      <path d="M0 9h42v7H0z" fill="#475569"/>
+      <path d="M7 8c2-16 26-16 28 0z" fill="#dbeafe" stroke="#3b82f6" stroke-width="1.5"/>
+      <circle cx="21" cy="7" r="4" fill="#60a5fa" opacity="0.85"/>
+      <path d="M17 16h8v26h-8z" fill="url(#mast)"/>
+    </g>
+
+    <!-- 边缘计算盒 -->
+    <g transform="translate(111 145)">
+      <rect width="45" height="39" rx="6" fill="#f8fafc" stroke="#64748b" stroke-width="1.5"/>
+      <rect x="7" y="8" width="23" height="5" rx="2" fill="#cbd5e1"/>
+      <rect x="7" y="17" width="31" height="4" rx="2" fill="#e2e8f0"/>
+      <circle cx="10" cy="30" r="3" fill="#10b981"/>
+      <circle cx="21" cy="30" r="3" fill="#3b82f6"/>
+      <path d="M36 27v6M33 30h6" stroke="#8a1c52" stroke-width="2" stroke-linecap="round"/>
+    </g>
+  </g>
+</svg>
