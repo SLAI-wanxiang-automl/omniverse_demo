@@ -101,17 +101,18 @@
 
         .canvas {
             position: relative;
-            width: 1350px;
+            width: 1420px;
+            flex: 0 0 1420px;
             height: 620px;
         }
 
         /* 大闭环外框 */
         .loop-border {
             position: absolute;
-            top: 20px;
-            left: 130px;
-            width: 1065px;
-            height: 580px;
+            top: 55px;
+            left: 250px;
+            width: 1060px;
+            height: 520px;
             border: 3px solid #f9a8d4;
             border-radius: 40px;
             z-index: 1;
@@ -178,9 +179,10 @@
         }
 
         #panel-input {
-            top: 120px;
-            left: 0px;
-            width: 145px;
+            top: 50%;
+            left: 10px;
+            width: 212px;
+            transform: translateY(-50%);
             border-color: var(--input-border);
         }
 
@@ -188,168 +190,166 @@
             color: var(--input-border);
         }
 
-        #panel-input > .side-item:not(.weather-source-entry) {
-            width: 100px;
+        #panel-input .side-item {
+            width: 108px;
+        }
+
+        #panel-input .weather-source-entry {
+            width: 100%;
+        }
+
+        #panel-input>.side-item:not(.weather-source-entry) {
+            padding: 7px;
+        }
+
+        #panel-input>.side-item:not(.weather-source-entry) .side-icon {
+            font-size: 1.55rem;
+        }
+
+        #panel-input>.side-item:not(.weather-source-entry) .icon-p {
+            width: 28px;
+            height: 28px;
+            font-size: 0.9rem;
         }
 
         .weather-source-entry {
             position: relative;
-            display: grid;
-            grid-template-columns: 42px minmax(0, 1fr);
-            grid-template-areas:
-                "hardware heading"
-                "sources sources";
+            width: 184px;
+            display: flex;
+            flex-direction: column;
             align-items: center;
-            column-gap: 5px;
-            width: 120px;
+            gap: 8px;
+            padding: 10px 10px 12px;
             appearance: none;
             font: inherit;
             cursor: pointer;
-            border: 2px solid var(--primary-color);
-            background: linear-gradient(155deg, #ffffff 0%, #fdf2f8 72%, #fce7f3 100%);
-            box-shadow: 0 10px 24px rgba(138, 28, 82, 0.14), inset 0 0 0 3px rgba(255, 255, 255, 0.72);
-            padding: 11px 8px 10px;
+            border-color: rgba(138, 28, 82, 0.38);
+            background: linear-gradient(155deg, #ffffff 0%, #fdf2f8 100%);
+            box-shadow: 0 5px 14px rgba(138, 28, 82, 0.08);
             transition: transform 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease;
         }
 
         .weather-source-entry:hover,
         .weather-source-entry:focus-visible {
-            transform: translateY(-3px) scale(1.02);
+            transform: translateY(-2px);
             border-color: var(--primary-color);
-            box-shadow: 0 14px 30px rgba(138, 28, 82, 0.22), inset 0 0 0 3px rgba(255, 255, 255, 0.76);
+            box-shadow: 0 8px 18px rgba(138, 28, 82, 0.16);
             outline: none;
         }
 
         .weather-source-entry::after {
-            content: '关键输入 · 点击详情';
+            content: '点击查看';
             position: absolute;
-            left: 50%;
-            top: -10px;
-            padding: 3px 7px;
+            right: -7px;
+            top: -7px;
+            padding: 2px 5px;
             border-radius: 999px;
             background: var(--primary-color);
             color: #fff;
-            font-size: 0.5rem;
-            font-weight: 800;
-            letter-spacing: 0.02em;
-            white-space: nowrap;
-            transform: translateX(-50%);
-        }
-
-        .weather-source-label {
-            grid-area: sources;
-            margin-top: 5px;
-            padding-top: 5px;
-            border-top: 1px dashed rgba(138, 28, 82, 0.28);
-            color: var(--primary-color);
-            line-height: 1.15;
-        }
-
-        .weather-source-label span,
-        .weather-source-label small,
-        .weather-source-label strong {
-            display: block;
-        }
-
-        .weather-source-label span {
-            margin-bottom: 4px;
-            color: var(--primary-color);
-            font-size: 0.58rem;
-            font-weight: 850;
-        }
-
-        .weather-source-label strong {
-            font-size: 0.66rem;
-            letter-spacing: 0.02em;
-        }
-
-        .weather-source-label small {
-            margin-top: 2px;
-            font-size: 0.54rem;
+            font-size: 0.52rem;
             font-weight: 700;
+            letter-spacing: 0.02em;
         }
 
-        .weather-source-entry .side-text {
-            grid-area: heading;
+        .weather-source-heading {
+            width: 100%;
+            text-align: center;
+        }
+
+        .weather-source-heading span,
+        .weather-source-heading strong {
+            display: block;
+        }
+
+        .weather-source-heading span {
+            color: var(--text-muted);
+            font-size: 0.54rem;
+            font-weight: 750;
+        }
+
+        .weather-source-heading strong {
+            margin-top: 1px;
             color: var(--primary-color);
-            font-size: 0.74rem;
-            font-weight: 900;
-            line-height: 1.25;
-            letter-spacing: 0;
-            text-align: left;
-            white-space: nowrap;
+            font-size: 0.82rem;
+            letter-spacing: 0.02em;
         }
 
-        .weather-source-entry .side-icon {
-            margin: 2px 0 4px;
-            font-size: 2.15rem;
-        }
-
-        .weather-hardware-hero {
-            grid-area: hardware;
-            position: relative;
-            width: 42px;
-            height: 58px;
-            margin: 4px 0 5px;
-            overflow: hidden;
-            border: 1px solid rgba(14, 116, 144, 0.18);
-            border-radius: 10px;
-            background:
-                radial-gradient(circle at 50% 40%, rgba(255, 255, 255, 0.98), rgba(236, 254, 255, 0.9) 58%, rgba(253, 242, 248, 0.86));
-        }
-
-        .weather-hardware-hero::before {
-            content: '';
-            position: absolute;
-            inset: 0;
-            background-image:
-                linear-gradient(rgba(14, 116, 144, 0.05) 1px, transparent 1px),
-                linear-gradient(90deg, rgba(14, 116, 144, 0.05) 1px, transparent 1px);
-            background-size: 14px 14px;
-        }
-
-        .weather-hardware-hero img {
-            position: relative;
-            z-index: 1;
-            display: block;
-            width: 42px;
-            height: 56px;
-            margin: 0 auto;
-            object-fit: contain;
-            filter: drop-shadow(0 4px 5px rgba(15, 23, 42, 0.16));
-        }
-
-        .weather-hardware-hero span {
-            position: absolute;
-            z-index: 2;
-            left: 50%;
-            bottom: 3px;
-            border: 1px solid rgba(15, 118, 110, 0.18);
-            border-radius: 999px;
-            background: rgba(236, 253, 245, 0.94);
-            padding: 1px 3px;
-            color: #047857;
-            font-size: 0.39rem;
-            font-weight: 850;
-            white-space: nowrap;
-            transform: translateX(-50%);
-        }
-
-        .weather-source-pair {
+        .weather-source-grid {
             display: grid;
-            gap: 3px;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 7px;
+            width: 100%;
         }
 
-        .weather-source-pair b {
+        .weather-input-source-card {
+            min-width: 0;
+            overflow: hidden;
+            border: 1px solid rgba(138, 28, 82, 0.22);
+            border-radius: 10px;
+            background: rgba(255, 255, 255, 0.9);
+            box-shadow: 0 4px 10px rgba(15, 23, 42, 0.07);
+        }
+
+        .weather-input-source-card[data-source="b"] {
+            border-color: rgba(37, 99, 235, 0.28);
+        }
+
+        .weather-source-media {
+            height: 72px;
+            padding: 4px;
+            border-bottom: 1px solid rgba(138, 28, 82, 0.12);
+            background: linear-gradient(145deg, #f8fafc, #fdf2f8);
+        }
+
+        .weather-input-source-card[data-source="b"] .weather-source-media {
+            border-bottom-color: rgba(37, 99, 235, 0.14);
+            background: linear-gradient(145deg, #eff6ff, #ecfeff);
+        }
+
+        .weather-source-media img {
             display: block;
-            border: 1px solid rgba(138, 28, 82, 0.16);
-            border-radius: 7px;
-            background: rgba(255, 255, 255, 0.82);
-            padding: 4px 3px;
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+        }
+
+        .weather-source-copy {
+            min-height: 46px;
+            padding: 5px 3px 6px;
+            text-align: center;
+        }
+
+        .weather-source-copy span,
+        .weather-source-copy strong {
+            display: block;
+        }
+
+        .weather-source-copy span {
+            color: #9d174d;
+            font-size: 0.48rem;
+            font-weight: 900;
+            letter-spacing: 0.04em;
+        }
+
+        .weather-input-source-card[data-source="b"] .weather-source-copy span {
+            color: #1d4ed8;
+        }
+
+        .weather-source-copy strong {
+            margin-top: 2px;
             color: #334155;
-            font-size: 0.55rem;
-            font-weight: 800;
-            white-space: nowrap;
+            font-size: 0.51rem;
+            line-height: 1.25;
+        }
+
+        .weather-source-footer {
+            width: 100%;
+            padding-top: 6px;
+            border-top: 1px dashed rgba(138, 28, 82, 0.25);
+            color: var(--text-muted);
+            font-size: 0.52rem;
+            font-weight: 750;
+            text-align: center;
         }
 
         .weather-live-dot {
@@ -369,7 +369,6 @@
             100% { box-shadow: 0 0 0 0 rgba(16, 185, 129, 0); }
         }
 
-
         .icon-p {
             display: inline-flex;
             align-items: center;
@@ -386,7 +385,7 @@
 
         #panel-output {
             top: 160px;
-            left: 1220px;
+            left: 1320px;
             width: 100px;
             border-color: var(--output-border);
             padding: 30px 10px;
@@ -447,15 +446,15 @@
         /* 具体节点定位与尺寸微调 */
         #node-data {
             top: 220px;
-            left: 160px;
-            width: 200px;
+            left: 270px;
+            width: 215px;
             height: 130px;
         }
 
         #node-automl {
             top: 120px;
-            left: 400px;
-            width: 500px;
+            left: 525px;
+            width: 520px;
             height: 350px;
             border-width: 3px;
             justify-content: flex-start;
@@ -464,22 +463,22 @@
 
         #node-predict {
             top: 130px;
-            left: 950px;
-            width: 220px;
+            left: 1085px;
+            width: 210px;
             height: 120px;
         }
 
         #node-diagnose {
             top: 330px;
-            left: 950px;
-            width: 220px;
+            left: 1085px;
+            width: 210px;
             height: 120px;
         }
 
         #node-feedback {
             top: 490px;
-            left: 400px;
-            width: 770px;
+            left: 525px;
+            width: 760px;
             height: 60px;
             border-color: var(--feedback-border);
             border-radius: 30px;
@@ -522,6 +521,7 @@
             color: var(--text-main);
             font-size: 1rem;
             letter-spacing: 1px;
+            white-space: nowrap;
             border-radius: 4px;
         }
 
@@ -584,8 +584,8 @@
         /* 线条具体定位 */
         #line0 {
             top: 285px;
-            left: 145px;
-            width: 15px;
+            left: 222px;
+            width: 48px;
             height: 3px;
         }
 
@@ -598,7 +598,7 @@
 
         #line1 {
             top: 285px;
-            left: 360px;
+            left: 485px;
             width: 40px;
             height: 3px;
         }
@@ -612,8 +612,8 @@
 
         #line2 {
             top: 190px;
-            left: 900px;
-            width: 50px;
+            left: 1045px;
+            width: 40px;
             height: 3px;
         }
 
@@ -626,7 +626,7 @@
 
         #line3 {
             top: 250px;
-            left: 1060px;
+            left: 1188px;
             width: 3px;
             height: 80px;
         }
@@ -640,8 +640,8 @@
 
         #line-out1 {
             top: 190px;
-            left: 1170px;
-            width: 50px;
+            left: 1295px;
+            width: 25px;
             height: 3px;
         }
 
@@ -654,8 +654,8 @@
 
         #line-out2 {
             top: 390px;
-            left: 1170px;
-            width: 50px;
+            left: 1295px;
+            width: 25px;
             height: 3px;
         }
 
@@ -668,7 +668,7 @@
 
         #line4 {
             top: 450px;
-            left: 1060px;
+            left: 1188px;
             width: 3px;
             height: 40px;
         }
@@ -682,7 +682,7 @@
 
         #line5 {
             top: 450px;
-            left: 650px;
+            left: 785px;
             width: 3px;
             height: 40px;
         }
@@ -1983,6 +1983,54 @@
             --weather-accent: #0f766e;
         }
 
+        .weather-source-banner {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 12px;
+            margin: 10px 0 12px;
+            padding: 10px 12px;
+            border-radius: 12px;
+            border: 1px solid rgba(138, 28, 82, 0.16);
+            background: linear-gradient(135deg, #fff7ed 0%, #fdf2f8 100%);
+        }
+
+        .weather-source-banner-copy span {
+            display: block;
+            margin-bottom: 3px;
+            color: var(--text-muted);
+            font-size: 0.58rem;
+            font-weight: 800;
+        }
+
+        .weather-source-banner-copy strong {
+            display: block;
+            color: var(--primary-color);
+            font-size: 0.92rem;
+            line-height: 1.25;
+        }
+
+        .weather-source-banner-tags {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: flex-end;
+            gap: 6px;
+        }
+
+        .weather-source-banner-tags span {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            padding: 4px 8px;
+            border-radius: 999px;
+            border: 1px solid rgba(138, 28, 82, 0.16);
+            background: #fff;
+            color: #475569;
+            font-size: 0.56rem;
+            font-weight: 800;
+            white-space: nowrap;
+        }
+
         .weather-station-stage {
             display: grid;
             grid-template-columns: minmax(240px, 0.95fr) minmax(210px, 0.78fr) minmax(290px, 1.08fr);
@@ -2434,567 +2482,573 @@
             font-size: 0.61rem;
         }
 
-        /* 多源外生环境信息：两个来源汇聚为一个场站级输出 */
-        .exogenous-overview-stage {
+        /* 多源外生环境信息：实测与 NWP 双源汇聚 */
+        .modal-content.weather-modal {
+            width: min(1180px, calc(100vw - 36px));
+        }
+
+        .weather-modal .modal-visual {
+            min-height: 0;
+            padding: 20px 22px 16px;
+        }
+
+        .weather-station-demo {
+            color: #172033;
+        }
+
+        .weather-station-demo .lab-toolbar {
+            align-items: center;
+            margin-bottom: 18px;
+        }
+
+        .weather-station-demo .lab-toolbar strong {
+            display: block;
+            max-width: 650px;
+            color: #14213d;
+            font-size: 1.08rem;
+            line-height: 1.35;
+        }
+
+        .weather-dual-stage {
             display: grid;
-            grid-template-columns: minmax(280px, 0.98fr) minmax(190px, 0.64fr) minmax(320px, 1.12fr);
-            gap: 14px;
+            grid-template-columns: minmax(315px, 1.08fr) minmax(210px, 0.68fr) minmax(390px, 1.28fr);
+            gap: 18px;
+            min-height: 455px;
             align-items: stretch;
         }
 
-        .exogenous-source-stack {
+        .weather-source-stack {
             display: grid;
-            grid-template-rows: repeat(2, minmax(0, 1fr));
-            gap: 10px;
+            grid-template-rows: 1fr 1fr;
+            gap: 14px;
         }
 
-        .exogenous-source-card {
-            position: relative;
-            overflow: hidden;
-            appearance: none;
-            width: 100%;
-            border: 1px solid #cbd5e1;
+        .weather-source-card,
+        .weather-unified-output,
+        .weather-merge-panel {
+            border: 1px solid #d8e0eb;
             border-radius: 14px;
             background: #fff;
-            padding: 11px;
-            color: var(--text-main);
-            font: inherit;
-            text-align: left;
+        }
+
+        .weather-source-card {
+            position: relative;
+            padding: 14px;
             cursor: pointer;
-            box-shadow: 0 7px 20px rgba(15, 23, 42, 0.06);
-            transition: opacity 0.25s ease, transform 0.25s ease, border-color 0.25s ease, box-shadow 0.25s ease;
-        }
-
-        .exogenous-source-card:hover,
-        .exogenous-source-card:focus-visible,
-        .exogenous-source-card[aria-pressed="true"] {
-            transform: translateY(-2px);
-            border-color: var(--primary-color);
-            box-shadow: 0 11px 26px rgba(138, 28, 82, 0.12);
             outline: none;
+            transition: border-color .2s ease, box-shadow .2s ease, transform .2s ease, opacity .2s ease;
         }
 
-        .exogenous-source-head {
+        .weather-source-card:hover,
+        .weather-source-card.is-focused {
+            border-color: rgba(138, 28, 82, .55);
+            box-shadow: 0 10px 24px rgba(138, 28, 82, .1);
+            transform: translateY(-2px);
+        }
+
+        .weather-source-card:focus-visible,
+        .weather-merge-panel:focus-visible {
+            outline: 3px solid rgba(138, 28, 82, .2);
+            outline-offset: 2px;
+        }
+
+        .weather-station-demo.has-focus .weather-source-card:not(.is-focused) {
+            opacity: .46;
+            filter: saturate(.55);
+            transform: scale(.985);
+        }
+
+        .weather-station-demo[data-source-focus="observed"] .weather-now-source,
+        .weather-station-demo[data-source-focus="forecast"] .weather-future-source {
+            box-shadow: 0 0 0 2px currentColor, 0 8px 18px rgba(15, 23, 42, .08);
+            transform: translateY(-2px);
+        }
+
+        .weather-station-demo[data-source-focus="observed"] .weather-future-source,
+        .weather-station-demo[data-source-focus="forecast"] .weather-now-source {
+            opacity: .24;
+            filter: grayscale(.35);
+        }
+
+        .weather-station-demo[data-source-focus="observed"] .weather-output-row b,
+        .weather-station-demo[data-source-focus="forecast"] .weather-output-row strong {
+            opacity: .22;
+            filter: grayscale(.4);
+        }
+
+        .weather-station-demo[data-source-focus="observed"] .weather-output-row strong,
+        .weather-station-demo[data-source-focus="forecast"] .weather-output-row b {
+            font-weight: 800;
+            text-shadow: 0 0 10px currentColor;
+        }
+
+        .weather-source-card-head,
+        .weather-source-meta,
+        .weather-output-heading,
+        .weather-output-source,
+        .weather-output-row,
+        .weather-chain-grid {
             display: flex;
-            align-items: flex-start;
+            align-items: center;
             justify-content: space-between;
             gap: 8px;
-            margin-bottom: 7px;
         }
 
-        .exogenous-source-head span,
-        .exogenous-source-head strong,
-        .exogenous-source-head small {
+        .weather-eyebrow {
             display: block;
-        }
-
-        .exogenous-source-head span {
             color: #64748b;
-            font-size: 0.59rem;
+            font-size: .64rem;
             font-weight: 800;
-            letter-spacing: 0.06em;
-            text-transform: uppercase;
         }
 
-        .exogenous-source-head strong {
-            margin-top: 1px;
-            color: #0f172a;
-            font-size: 0.82rem;
+        .weather-source-card h4,
+        .weather-unified-output h4 {
+            margin: 2px 0 0;
+            color: #14213d;
+            font-size: .98rem;
         }
 
-        .exogenous-source-head small {
-            margin-top: 2px;
+        .weather-source-card p {
+            margin: 4px 0 10px;
             color: #64748b;
-            font-size: 0.59rem;
+            font-size: .68rem;
         }
 
-        .exogenous-source-badge {
+        .weather-source-badge {
             flex: 0 0 auto;
+            padding: 5px 8px;
             border-radius: 999px;
-            padding: 4px 7px;
-            font-size: 0.56rem;
-            font-weight: 900;
-            white-space: nowrap;
-        }
-
-        .exogenous-source-card[data-exo-source="station"] .exogenous-source-badge {
             background: #ecfdf5;
             color: #047857;
+            font-size: .64rem;
+            font-weight: 800;
         }
 
-        .exogenous-source-card[data-exo-source="nwp"] .exogenous-source-badge {
+        .weather-source-badge.nwp {
             background: #eff6ff;
             color: #1d4ed8;
         }
 
-        .exogenous-source-card .weather-station-visual {
-            height: 94px;
-            margin: 6px 0 7px;
+        .weather-source-card .weather-station-visual {
+            height: 116px;
+            margin: 8px 0;
+            transition: background .35s ease, filter .35s ease;
         }
 
-        .exogenous-source-card .weather-mast {
-            bottom: 12px;
-            height: 62px;
-            width: 4px;
+        .weather-station-demo[data-weather-case="lowRadiation"] .weather-station-visual {
+            background: linear-gradient(180deg, #dbeafe 0%, #e2e8f0 62%, #e7efc5 62%, #f1f5d8 100%);
+            filter: saturate(.72) brightness(.94);
         }
 
-        .exogenous-source-card .weather-mast::after {
-            width: 46px;
-            height: 6px;
+        .weather-station-demo[data-weather-case="soilDry"] .weather-station-visual {
+            background: linear-gradient(180deg, #e0f2fe 0%, #f0fdfa 62%, #fef3c7 62%, #fde68a 100%);
         }
 
-        .exogenous-source-card .weather-sensor-hub {
-            left: calc(50% - 25px);
-            bottom: 62px;
-            font-size: 1.35rem;
+        .weather-station-demo[data-weather-case="rain"] .weather-station-visual {
+            background: linear-gradient(180deg, #cbd5e1 0%, #dbeafe 62%, #d9f99d 62%, #ecfccb 100%);
+            filter: saturate(.85) brightness(.92);
         }
 
-        .exogenous-source-card .weather-camera {
-            left: calc(50% + 2px);
-            bottom: 43px;
-            font-size: 0.95rem;
+        .weather-station-demo[data-weather-case="lowRadiation"] .weather-radiation-sensor {
+            opacity: .38;
+            filter: grayscale(.7);
         }
 
-        .exogenous-source-card .weather-rain-gauge {
-            left: calc(50% - 38px);
-            bottom: 27px;
-            font-size: 0.9rem;
+        .weather-station-demo[data-weather-case="rain"] .weather-rain-gauge {
+            animation: weatherRainPulse .72s ease-in-out infinite alternate;
         }
 
-        .exogenous-source-card .weather-radiation-sensor {
-            left: calc(50% + 13px);
-            bottom: 18px;
-            font-size: 0.95rem;
+        @keyframes weatherRainPulse {
+            to { transform: translateY(5px) scale(1.08); }
         }
 
-        .exogenous-source-features {
-            display: flex;
+        .weather-source-card .weather-mast {
+            bottom: 15px;
+            height: 78px;
+        }
+
+        .weather-source-card .weather-sensor-hub {
+            bottom: 78px;
+            font-size: 1.45rem;
+        }
+
+        .weather-source-card .weather-camera {
+            bottom: 56px;
+            font-size: 1rem;
+        }
+
+        .weather-source-card .weather-rain-gauge {
+            bottom: 36px;
+            font-size: 1rem;
+        }
+
+        .weather-source-card .weather-radiation-sensor {
+            bottom: 24px;
+            font-size: 1rem;
+        }
+
+        .weather-source-meta {
+            justify-content: flex-start;
             flex-wrap: wrap;
-            gap: 4px;
+            gap: 5px;
         }
 
-        .exogenous-source-features span {
-            border: 1px solid #e2e8f0;
+        .weather-source-meta span {
+            padding: 4px 7px;
+            border: 1px solid #dbe3ee;
             border-radius: 999px;
             background: #f8fafc;
-            padding: 3px 6px;
             color: #475569;
-            font-size: 0.55rem;
-            font-weight: 750;
+            font-size: .61rem;
+            font-weight: 700;
         }
 
-        .nwp-scale-visual {
+        .weather-nwp-map {
             position: relative;
-            height: 82px;
-            margin: 5px 0 7px;
+            height: 106px;
+            margin: 8px 0;
             overflow: hidden;
             border: 1px solid #bfdbfe;
-            border-radius: 10px;
+            border-radius: 11px;
             background:
-                linear-gradient(rgba(255,255,255,0.42), rgba(255,255,255,0.1)),
-                radial-gradient(circle at 24% 32%, #93c5fd 0 11%, transparent 30%),
-                radial-gradient(circle at 68% 61%, #fbbf24 0 9%, transparent 28%),
-                linear-gradient(135deg, #dbeafe, #e0f2fe 50%, #fef3c7);
+                radial-gradient(circle at 67% 50%, rgba(251, 191, 36, .55), transparent 27%),
+                linear-gradient(120deg, #dbeafe 0%, #bfdbfe 45%, #fef3c7 70%, #eff6ff 100%);
         }
 
-        .nwp-scale-visual::before {
+        .weather-nwp-map::before {
             content: '';
             position: absolute;
             inset: 0;
-            background-image:
-                linear-gradient(rgba(30, 64, 175, 0.19) 1px, transparent 1px),
-                linear-gradient(90deg, rgba(30, 64, 175, 0.19) 1px, transparent 1px);
-            background-size: 28px 28px;
-            animation: nwpGridShift 5s linear infinite;
+            background-image: linear-gradient(rgba(59, 130, 246, .19) 1px, transparent 1px), linear-gradient(90deg, rgba(59, 130, 246, .19) 1px, transparent 1px);
+            background-size: 38px 28px;
         }
 
-        @keyframes nwpGridShift {
-            to { background-position: 28px 0, 28px 0; }
-        }
-
-        .nwp-station-pin {
+        .weather-map-pin {
             position: absolute;
-            z-index: 2;
-            left: 66%;
+            left: 67%;
             top: 51%;
-            width: 13px;
-            height: 13px;
-            border: 3px solid #fff;
+            width: 24px;
+            height: 24px;
+            border: 5px solid rgba(255, 255, 255, .82);
             border-radius: 50% 50% 50% 0;
-            background: var(--primary-color);
-            box-shadow: 0 0 0 4px rgba(138, 28, 82, 0.14);
-            transform: translate(-50%, -50%) rotate(-45deg);
-            animation: nwpPinPulse 1.8s ease-in-out infinite;
+            background: #b83267;
+            box-shadow: 0 5px 14px rgba(138, 28, 82, .25);
+            transform: translate(-50%, -70%) rotate(-45deg);
         }
 
-        @keyframes nwpPinPulse {
-            50% { box-shadow: 0 0 0 9px rgba(138, 28, 82, 0.03); }
-        }
-
-        .nwp-scale-labels {
+        .weather-map-pin::after {
+            content: '';
             position: absolute;
-            z-index: 2;
-            inset: auto 7px 6px;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            color: #1e3a8a;
-            font-size: 0.52rem;
-            font-weight: 850;
+            width: 6px;
+            height: 6px;
+            left: 4px;
+            top: 4px;
+            border-radius: 50%;
+            background: #fff;
         }
 
-        .exogenous-convergence-panel {
-            position: relative;
-            overflow: hidden;
+        .weather-map-label {
+            position: absolute;
+            bottom: 8px;
+            z-index: 1;
+            color: #1e3a8a;
+            font-size: .58rem;
+            font-weight: 800;
+        }
+
+        .weather-map-label:first-of-type { left: 9px; }
+        .weather-map-label:last-of-type { right: 9px; }
+
+        .weather-merge-panel {
             display: flex;
             flex-direction: column;
+            align-items: center;
             justify-content: center;
-            border: 1px solid rgba(14, 116, 144, 0.25);
-            border-radius: 14px;
-            background: linear-gradient(180deg, #f8fafc, #ecfeff);
-            padding: 14px 13px;
-            box-shadow: 0 7px 20px rgba(15, 23, 42, 0.05);
-        }
-
-        .exogenous-convergence-panel h4 {
-            margin-bottom: 3px;
-            color: #0f766e;
+            padding: 20px 16px;
+            border-color: #b8dce8;
+            background: linear-gradient(180deg, #f7fcff 0%, #eefcfa 100%);
             text-align: center;
-            font-size: 0.9rem;
+            cursor: pointer;
+            outline: none;
         }
 
-        .exogenous-convergence-panel > small {
+        .weather-merge-panel h4 {
+            margin: 0;
+            color: #2f766f;
+            font-size: 1rem;
+        }
+
+        .weather-merge-panel p {
+            margin: 5px 0 18px;
             color: #64748b;
-            text-align: center;
-            font-size: 0.61rem;
-            line-height: 1.35;
+            font-size: .67rem;
+            line-height: 1.45;
         }
 
-        .exogenous-convergence-flow {
+        .weather-merge-graphic {
             position: relative;
-            height: 62px;
-            margin: 8px 0 5px;
+            width: 100%;
+            height: 94px;
+            margin-bottom: 18px;
         }
 
-        .exogenous-convergence-flow::before,
-        .exogenous-convergence-flow::after {
+        .weather-merge-graphic::before,
+        .weather-merge-graphic::after {
             content: '';
             position: absolute;
             left: 0;
             width: 46%;
             height: 2px;
-            background: linear-gradient(90deg, #0ea5e9, #10b981);
+            background: #38a3c8;
+            transform-origin: right center;
         }
 
-        .exogenous-convergence-flow::before {
-            top: 13px;
-            transform: rotate(18deg);
-            transform-origin: left center;
+        .weather-merge-graphic::before { top: 25px; transform: rotate(17deg); }
+        .weather-merge-graphic::after { bottom: 25px; transform: rotate(-17deg); }
+
+        .weather-station-demo.has-focus .weather-merge-graphic::before,
+        .weather-station-demo.has-focus .weather-merge-graphic::after {
+            transition: opacity .3s ease, height .3s ease, filter .3s ease;
         }
 
-        .exogenous-convergence-flow::after {
-            bottom: 13px;
-            transform: rotate(-18deg);
-            transform-origin: left center;
+        .weather-station-demo[data-source-focus="observed"] .weather-merge-graphic::before,
+        .weather-station-demo[data-source-focus="forecast"] .weather-merge-graphic::after {
+            height: 4px;
+            background: #2fae83;
+            filter: drop-shadow(0 0 4px rgba(47, 174, 131, .4));
         }
 
-        .exogenous-merge-node {
+        .weather-station-demo[data-source-focus="observed"] .weather-merge-graphic::after,
+        .weather-station-demo[data-source-focus="forecast"] .weather-merge-graphic::before {
+            opacity: .18;
+        }
+
+        .weather-merge-node {
             position: absolute;
-            z-index: 2;
-            left: 46%;
+            left: 50%;
             top: 50%;
-            width: 48px;
-            height: 48px;
-            border: 2px solid #0f766e;
-            border-radius: 50%;
-            background: #fff;
+            width: 64px;
+            height: 64px;
             display: grid;
             place-items: center;
-            color: #0f766e;
-            font-size: 1.25rem;
+            border: 3px solid #357c75;
+            border-radius: 50%;
+            background: #fff;
+            box-shadow: 0 0 0 9px rgba(53, 124, 117, .09);
+            color: #357c75;
+            font-size: 1.1rem;
             transform: translate(-50%, -50%);
-            box-shadow: 0 0 0 6px rgba(15, 118, 110, 0.08);
+            transition: border-color .3s ease, box-shadow .3s ease, transform .3s ease;
         }
 
-        .exogenous-merge-arrow {
+        .weather-station-demo.has-focus .weather-merge-node {
+            border-color: #2fae83;
+            box-shadow: 0 0 0 10px rgba(47, 174, 131, .12), 0 0 24px rgba(47, 174, 131, .18);
+            animation: weatherMergeNodePulse 1.5s ease-in-out infinite;
+        }
+
+        @keyframes weatherMergeNodePulse {
+            50% { transform: translate(-50%, -50%) scale(1.06); }
+        }
+
+        .weather-merge-graphic i {
             position: absolute;
-            left: calc(46% + 25px);
+            left: calc(50% + 34px);
             right: 0;
             top: 50%;
             height: 2px;
-            background: linear-gradient(90deg, #10b981, var(--primary-color));
+            background: linear-gradient(90deg, #357c75, #8a1c52);
         }
 
-        .exogenous-merge-arrow::before {
-            content: '';
-            position: absolute;
-            left: 0;
-            top: -3px;
-            width: 8px;
-            height: 8px;
-            border: 2px solid #10b981;
-            border-radius: 50%;
-            background: #fff;
-            animation: exogenousMergePacket 1.7s linear infinite;
-        }
-
-        .exogenous-merge-arrow::after {
+        .weather-merge-graphic i::before {
             content: '';
             position: absolute;
             right: -1px;
-            top: -4px;
-            border-width: 5px 0 5px 8px;
+            top: -5px;
+            border-width: 6px 0 6px 10px;
             border-style: solid;
-            border-color: transparent transparent transparent var(--primary-color);
+            border-color: transparent transparent transparent #8a1c52;
         }
 
-        @keyframes exogenousMergePacket {
-            to { transform: translateX(64px); border-color: var(--primary-color); }
-        }
-
-        .exogenous-unify-list {
-            display: grid;
-            gap: 6px;
-        }
-
-        .exogenous-unify-list span {
-            border: 1px solid rgba(14, 116, 144, 0.15);
-            border-radius: 8px;
-            background: rgba(255, 255, 255, 0.84);
-            padding: 6px 7px;
-            color: #475569;
-            font-size: 0.61rem;
-            font-weight: 750;
-            text-align: center;
-        }
-
-        .exogenous-output-panel {
-            position: relative;
-            overflow: hidden;
-            border: 1px solid rgba(138, 28, 82, 0.26);
-            border-radius: 14px;
+        .weather-merge-graphic i::after {
+            content: '';
+            position: absolute;
+            left: 45%;
+            top: -5px;
+            width: 9px;
+            height: 9px;
+            border: 2px solid #5b6670;
+            border-radius: 50%;
             background: #fff;
-            padding: 13px;
-            box-shadow: 0 9px 26px rgba(138, 28, 82, 0.08);
         }
 
-        .exogenous-output-head {
-            display: flex;
-            align-items: flex-start;
-            justify-content: space-between;
+        @keyframes weatherMergeFlow {
+            50% { transform: translateX(24px); }
+        }
+
+        .weather-merge-rules {
+            width: 100%;
+            display: grid;
             gap: 8px;
         }
 
-        .exogenous-output-head span,
-        .exogenous-output-head strong,
-        .exogenous-output-head small {
-            display: block;
+        .weather-merge-rules span {
+            padding: 8px 6px;
+            border: 1px solid #d7e5ea;
+            border-radius: 9px;
+            background: rgba(255, 255, 255, .82);
+            color: #526174;
+            font-size: .67rem;
+            font-weight: 700;
         }
 
-        .exogenous-output-head span {
-            color: #64748b;
-            font-size: 0.58rem;
+        .weather-unified-output {
+            padding: 16px;
+            border-color: rgba(138, 28, 82, .22);
+        }
+
+        .weather-output-pill {
+            padding: 5px 9px;
+            border: 1px solid rgba(138, 28, 82, .18);
+            border-radius: 999px;
+            background: #fdf2f8;
+            color: var(--primary-color);
+            font-size: .61rem;
             font-weight: 800;
         }
 
-        .exogenous-output-head strong {
-            color: var(--primary-color);
-            font-size: 0.95rem;
-        }
-
-        .exogenous-output-head small {
-            margin-top: 2px;
+        .weather-output-copy {
+            margin: 5px 0 16px;
             color: #64748b;
-            font-size: 0.6rem;
+            font-size: .67rem;
         }
 
-        .exogenous-key-badge {
-            flex: 0 0 auto;
-            border-radius: 999px;
-            background: #fdf2f8;
-            border: 1px solid rgba(138, 28, 82, 0.2);
-            padding: 4px 7px;
-            color: var(--primary-color);
-            font-size: 0.55rem;
-            font-weight: 900;
-            white-space: nowrap;
-        }
-
-        .exogenous-timeline {
+        .weather-output-source {
             position: relative;
-            display: grid;
-            grid-template-columns: 1fr 42px 1fr;
-            align-items: center;
-            margin: 12px 0 10px;
-            padding-top: 15px;
+            margin-bottom: 14px;
+            padding-bottom: 20px;
         }
 
-        .exogenous-timeline-segment {
-            position: relative;
-            height: 38px;
-            border-radius: 8px;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            padding: 0 8px;
-            transition: opacity 0.25s ease, transform 0.25s ease;
-        }
-
-        .exogenous-timeline-segment strong,
-        .exogenous-timeline-segment small {
-            display: block;
-        }
-
-        .exogenous-timeline-segment strong {
-            font-size: 0.63rem;
-        }
-
-        .exogenous-timeline-segment small {
-            font-size: 0.52rem;
-        }
-
-        .exogenous-timeline-history {
-            background: #ecfdf5;
-            color: #047857;
-            text-align: right;
-        }
-
-        .exogenous-timeline-future {
-            background: #eff6ff;
-            color: #1d4ed8;
-        }
-
-        .exogenous-timeline-now {
-            position: relative;
-            height: 54px;
-            display: grid;
-            place-items: center;
-            color: var(--primary-color);
-            font-size: 0.53rem;
-            font-weight: 900;
-        }
-
-        .exogenous-timeline-now::before {
+        .weather-output-source::after {
             content: '';
             position: absolute;
-            top: -5px;
-            bottom: -5px;
             left: 50%;
+            bottom: 0;
             width: 2px;
+            height: 27px;
             background: var(--primary-color);
             transform: translateX(-50%);
         }
 
-        .exogenous-timeline-now i {
-            z-index: 1;
-            width: 10px;
-            height: 10px;
-            border: 3px solid #fff;
-            border-radius: 50%;
-            background: var(--primary-color);
-            box-shadow: 0 0 0 3px rgba(138, 28, 82, 0.12);
-        }
-
-        .exogenous-timeline-now span {
-            position: absolute;
-            top: -14px;
-            white-space: nowrap;
-        }
-
-        .exogenous-variable-table {
-            display: grid;
-            gap: 5px;
-        }
-
-        .exogenous-variable-row {
-            display: grid;
-            grid-template-columns: 72px 1fr 1.15fr;
-            gap: 5px;
-            align-items: center;
-            border: 1px solid #e2e8f0;
-            border-radius: 8px;
-            background: #f8fafc;
-            padding: 6px 7px;
-            font-size: 0.59rem;
-        }
-
-        .exogenous-variable-row:first-child {
-            border: 0;
-            background: transparent;
-            padding-top: 0;
-            padding-bottom: 1px;
-            color: #94a3b8;
-            font-size: 0.52rem;
+        .weather-now-source,
+        .weather-future-source {
+            width: 46%;
+            padding: 9px 10px;
+            border-radius: 10px;
+            text-align: center;
+            font-size: .67rem;
             font-weight: 800;
+            transition: opacity .3s ease, transform .3s ease, box-shadow .3s ease, filter .3s ease;
         }
 
-        .exogenous-variable-row strong {
-            color: #334155;
-        }
+        .weather-now-source { background: #ecfdf5; color: #047857; }
+        .weather-future-source { background: #eff6ff; color: #1d4ed8; }
 
-        .exogenous-variable-row b {
-            color: #047857;
-            font-variant-numeric: tabular-nums;
-        }
-
-        .exogenous-variable-row em {
-            color: #1d4ed8;
-            font-style: normal;
-            font-weight: 750;
-            font-variant-numeric: tabular-nums;
-        }
-
-        .exogenous-downstream {
-            margin-top: 9px;
-            border-top: 1px dashed rgba(138, 28, 82, 0.22);
-            padding-top: 8px;
-        }
-
-        .exogenous-downstream > span {
-            display: block;
-            margin-bottom: 5px;
+        .weather-output-axis {
+            position: absolute;
+            left: 50%;
+            bottom: 22px;
             color: var(--primary-color);
-            font-size: 0.58rem;
-            font-weight: 900;
+            font-size: .58rem;
+            font-weight: 800;
+            transform: translateX(-50%);
         }
 
-        .exogenous-downstream-list {
+        .weather-output-table {
             display: grid;
-            grid-template-columns: repeat(2, minmax(0, 1fr));
-            gap: 4px;
+            gap: 7px;
         }
 
-        .exogenous-downstream-list b {
-            border-radius: 6px;
+        .weather-output-row {
+            display: grid;
+            grid-template-columns: 92px 1fr 1.35fr;
+            padding: 8px 10px;
+            border: 1px solid #dce4ee;
+            border-radius: 9px;
+            background: #f8fafc;
+            font-size: .67rem;
+        }
+
+        .weather-output-row span { color: #334155; font-weight: 700; }
+        .weather-output-row strong { color: #047857; font-variant-numeric: tabular-nums; }
+        .weather-output-row b { color: #1d4ed8; font-variant-numeric: tabular-nums; }
+
+        .weather-output-row strong,
+        .weather-output-row b {
+            transition: opacity .3s ease, filter .3s ease;
+        }
+
+        .weather-station-demo.is-updating .weather-source-meta [data-weather-state],
+        .weather-station-demo.is-updating .weather-output-row strong,
+        .weather-station-demo.is-updating .weather-output-row b {
+            animation: weatherValueRefresh .48s ease both;
+        }
+
+        .weather-station-demo.case-changing .weather-source-card:first-child,
+        .weather-station-demo.case-changing .weather-unified-output {
+            animation: weatherCaseChange .56s ease both;
+        }
+
+        @keyframes weatherCaseChange {
+            0% { opacity: .62; transform: translateY(5px); }
+            55% { box-shadow: 0 0 0 3px rgba(138, 28, 82, .08); }
+            100% { opacity: 1; transform: translateY(0); }
+        }
+
+        .weather-station-demo.source-changing .weather-merge-graphic i::after {
+            animation: weatherSourcePacket .62s ease-out both;
+        }
+
+        @keyframes weatherSourcePacket {
+            from { left: 0; opacity: 0; transform: scale(.65); }
+            35% { opacity: 1; }
+            to { left: 88%; opacity: 0; transform: scale(1.15); }
+        }
+
+        .weather-chain {
+            margin-top: 14px;
+            padding-top: 12px;
+            border-top: 1px dashed rgba(138, 28, 82, .25);
+        }
+
+        .weather-chain > strong {
+            display: block;
+            margin-bottom: 7px;
+            color: var(--primary-color);
+            font-size: .66rem;
+        }
+
+        .weather-chain-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 6px;
+        }
+
+        .weather-chain-grid span {
+            padding: 6px;
+            border-radius: 8px;
             background: #fdf2f8;
-            padding: 5px 4px;
-            color: #7e1744;
-            font-size: 0.54rem;
+            color: #7f1d4c;
             text-align: center;
+            font-size: .6rem;
+            font-weight: 700;
         }
 
-        .exogenous-source-hint {
-            margin-top: 10px;
+        .weather-demo-hint {
+            margin: 14px 0 0;
             color: #64748b;
-            font-size: 0.61rem;
             text-align: center;
-        }
-
-        .weather-station-demo[data-source-focus="station"] .exogenous-source-card[data-exo-source="nwp"],
-        .weather-station-demo[data-source-focus="nwp"] .exogenous-source-card[data-exo-source="station"] {
-            opacity: 0.42;
-            transform: scale(0.98);
-        }
-
-        .weather-station-demo[data-source-focus="station"] .exogenous-timeline-future,
-        .weather-station-demo[data-source-focus="nwp"] .exogenous-timeline-history {
-            opacity: 0.35;
-            transform: scaleY(0.92);
-        }
-
-        .weather-station-demo.is-updating .exogenous-variable-row b,
-        .weather-station-demo.is-updating .exogenous-timeline-history {
-            animation: weatherValueRefresh 0.45s ease both;
+            font-size: .64rem;
         }
 
         @media (max-width: 820px) {
@@ -3018,9 +3072,9 @@
             .weather-target-arrow { width: 2px; height: 38px; flex-basis: 38px; margin-left: 50%; }
             .weather-target-arrow::after { right: -4px; top: auto; bottom: -1px; border-width: 8px 5px 0; border-color: var(--primary-color) transparent transparent; }
             .weather-target-arrow i { left: -3px; top: 0; animation-name: weatherTargetFlowMobile; }
-            .exogenous-overview-stage { grid-template-columns: 1fr; }
-            .exogenous-source-stack { grid-template-columns: repeat(2, minmax(0, 1fr)); grid-template-rows: none; }
-            .exogenous-convergence-panel { min-height: 210px; }
+            .weather-dual-stage { grid-template-columns: 1fr; }
+            .weather-source-stack { grid-template-rows: none; }
+            .weather-merge-panel { min-height: 330px; }
         }
 
         @keyframes weatherTargetFlowMobile {
@@ -3030,8 +3084,6 @@
         @media (max-width: 520px) {
             .forecast-model-grid { grid-template-columns: 1fr; }
             .feedback-module-flow { grid-template-columns: 1fr; }
-            .exogenous-source-stack { grid-template-columns: 1fr; }
-            .exogenous-variable-row { grid-template-columns: 58px 1fr 1fr; }
         }
 
         @media (prefers-reduced-motion: reduce) {
@@ -3069,20 +3121,33 @@
                         <div class="side-icon">📈</div>
                         <div class="side-text">时序数据</div>
                     </div>
-                    <button class="side-item weather-source-entry" type="button" onclick="openModule('weather')" aria-label="查看多源外生环境信息详情">
+                    <button class="side-item weather-source-entry" type="button" onclick="openModule('weather')" aria-label="查看多源外生变量详情">
                         <span class="weather-live-dot" aria-hidden="true"></span>
-                        <div class="weather-hardware-hero" aria-hidden="true">
-                            <img src="assets/micro-weather-station.svg" alt="">
-                            <span>现场感知硬件</span>
+                        <div class="weather-source-heading">
+                            <span>双来源输入</span>
+                            <strong>外生变量</strong>
                         </div>
-                        <div class="side-text">多源外生<br>环境信息</div>
-                        <div class="weather-source-label">
-                            <span>双源汇聚</span>
-                            <div class="weather-source-pair">
-                                <b>📡 微气象实测</b>
-                                <b>🗺️ 降尺度 NWP</b>
+                        <div class="weather-source-grid">
+                            <div class="weather-input-source-card" data-source="a">
+                                <div class="weather-source-media">
+                                    <img src="assets/micro-weather-station.svg" alt="明月•万象多模态微气象站">
+                                </div>
+                                <div class="weather-source-copy">
+                                    <span>来源 A</span>
+                                    <strong>微气象站采集</strong>
+                                </div>
+                            </div>
+                            <div class="weather-input-source-card" data-source="b">
+                                <div class="weather-source-media">
+                                    <img src="assets/nwp-ml-downscaling.svg" alt="NWP 经机器学习降尺度形成场站精细气象信息">
+                                </div>
+                                <div class="weather-source-copy">
+                                    <span>来源 B</span>
+                                    <strong>NWP + ML 降尺度</strong>
+                                </div>
                             </div>
                         </div>
+                        <div class="weather-source-footer">软硬件一体 / 系统亮点</div>
                     </button>
                     <div class="side-item" style="margin-bottom: 0;">
                         <div class="icon-p">P</div>
@@ -3276,7 +3341,7 @@
             's3': {
                 title: "场景三：气象信息对预测性能提升",
                 context: "工况难题：突发云层遮挡、局地风速突变等微气象扰动会造成新能源出力快速波动。若系统只依赖历史功率外推，模型往往无法及时感知外部环境变化，预测结果容易滞后。",
-                value: "通过微气象站提供局地实况、NWP 降尺度提供场站级未来预报，系统形成覆盖当前与未来的外生变量，并将其与物理先验共同注入预测流程，从而更早识别气象扰动、动态修正黑盒外推结果，提升极端天气下的预测精度与运行可靠性。",
+                value: "通过多模态微气象站采集局地气象信息，并将其作为外生变量与物理先验注入预测流程，系统能够更早识别扰动来源，动态修正黑盒外推结果，从而提升极端天气下的预测精度与运行可靠性。",
                 videos: [
                     {
                         title: "气象增强预测演示",
@@ -3297,6 +3362,7 @@
         // 弹窗控制逻辑
         function openModule(modId) {
             const data = modulesData[modId];
+            document.querySelector('.modal-content').classList.toggle('weather-modal', modId === 'weather');
             document.getElementById('mod-title').innerText = data.title;
             document.getElementById('mod-value').innerText = data.value;
             document.getElementById('mod-visual').innerHTML = data.visual();
@@ -3392,13 +3458,13 @@
 
         function renderWeatherStationLab() {
             return `
-                <div class="module-lab weather-station-demo" id="weather-station-lab" data-source-focus="all">
+                <div class="module-lab weather-station-demo" id="weather-station-lab">
                     <div class="lab-toolbar">
                         <div>
                             <div class="lab-kicker">Multi-source Exogenous Environment</div>
                             <strong>微气象实测感知当前，NWP 降尺度预见未来，共同形成场站级外生变量</strong>
                         </div>
-                        <div class="lab-presets" role="group" aria-label="原型演示状态">
+                        <div class="lab-presets" role="group" aria-label="外生环境演示状态">
                             <button class="lab-preset active" type="button" data-weather-case="normal">正常观测</button>
                             <button class="lab-preset" type="button" data-weather-case="lowRadiation">低辐照</button>
                             <button class="lab-preset" type="button" data-weather-case="soilDry">土壤干燥</button>
@@ -3406,17 +3472,14 @@
                         </div>
                     </div>
 
-                    <div class="exogenous-overview-stage">
-                        <div class="exogenous-source-stack" aria-label="外生变量的两个来源">
-                            <button class="exogenous-source-card" type="button" data-exo-source="station" aria-pressed="false">
-                                <div class="exogenous-source-head">
-                                    <div>
-                                        <span>来源一 · 当前与历史</span>
-                                        <strong>明月•万象微气象实测</strong>
-                                        <small>回答“场站此刻发生了什么”</small>
-                                    </div>
-                                    <b class="exogenous-source-badge">2 秒采样</b>
+                    <div class="weather-dual-stage">
+                        <div class="weather-source-stack">
+                            <section class="weather-source-card" tabindex="0" data-weather-source="observed" aria-label="聚焦微气象站实测">
+                                <div class="weather-source-card-head">
+                                    <div><span class="weather-eyebrow">来源一 · 当前与历史</span><h4>明月·万象微气象实测</h4></div>
+                                    <span class="weather-source-badge">2 秒采样</span>
                                 </div>
+                                <p>回答“场站此刻发生了什么”</p>
                                 <div class="weather-station-visual" aria-label="多模态微气象站示意">
                                     <div class="weather-mast"></div>
                                     <div class="weather-sensor-hub" title="风速风向传感器">📡</div>
@@ -3424,44 +3487,29 @@
                                     <div class="weather-rain-gauge" title="雨量传感器">🌧️</div>
                                     <div class="weather-radiation-sensor" title="辐照传感器">☀️</div>
                                 </div>
-                                <div class="exogenous-source-features">
-                                    <span data-weather-state>观测正常</span>
-                                    <span>局地高频</span>
-                                    <span>多模态实测</span>
-                                    <span data-weather-updated>刚刚更新</span>
-                                </div>
-                            </button>
+                                <div class="weather-source-meta"><span data-weather-state>观测正常</span><span>局地高频</span><span>多模态实测</span><span data-weather-updated>刚刚更新</span></div>
+                            </section>
 
-                            <button class="exogenous-source-card" type="button" data-exo-source="nwp" aria-pressed="false">
-                                <div class="exogenous-source-head">
-                                    <div>
-                                        <span>来源二 · 未来</span>
-                                        <strong>NWP 降尺度预报</strong>
-                                        <small>回答“场站未来可能发生什么”</small>
-                                    </div>
-                                    <b class="exogenous-source-badge">未来 24 h</b>
+                            <section class="weather-source-card" tabindex="0" data-weather-source="forecast" aria-label="聚焦 NWP 降尺度预报">
+                                <div class="weather-source-card-head">
+                                    <div><span class="weather-eyebrow">来源二 · 未来</span><h4>NWP 降尺度预报</h4></div>
+                                    <span class="weather-source-badge nwp">未来 24 h</span>
                                 </div>
-                                <div class="nwp-scale-visual" aria-label="区域 NWP 网格聚焦到场站位置">
-                                    <i class="nwp-station-pin"></i>
-                                    <div class="nwp-scale-labels"><span>区域 NWP 网格</span><span>场站位置</span></div>
+                                <p>回答“场站未来可能发生什么”</p>
+                                <div class="weather-nwp-map" aria-label="区域 NWP 网格降尺度到场站位置">
+                                    <span class="weather-map-label">区域 NWP 网格</span>
+                                    <span class="weather-map-label">场站位置</span>
+                                    <i class="weather-map-pin"></i>
                                 </div>
-                                <div class="exogenous-source-features">
-                                    <span>区域预报</span>
-                                    <span>场站定位</span>
-                                    <span>小尺度序列</span>
-                                    <span>未来趋势</span>
-                                </div>
-                            </button>
+                                <div class="weather-source-meta"><span>区域预报</span><span>场站定位</span><span>小尺度序列</span><span>未来趋势</span></div>
+                            </section>
                         </div>
 
-                        <section class="exogenous-convergence-panel" aria-label="多源汇聚与统一表达">
+                        <section class="weather-merge-panel" tabindex="0" data-weather-source="all" aria-label="查看双源汇聚总览">
                             <h4>汇聚与统一表达</h4>
-                            <small>实况与预报在同一场站坐标和时间轴上连续衔接</small>
-                            <div class="exogenous-convergence-flow" aria-hidden="true">
-                                <i class="exogenous-merge-node">⌁</i>
-                                <i class="exogenous-merge-arrow"></i>
-                            </div>
-                            <div class="exogenous-unify-list">
+                            <p>实况与预报在同一场站坐标和时间轴上连续衔接</p>
+                            <div class="weather-merge-graphic" aria-hidden="true"><span class="weather-merge-node">⌁</span><i></i></div>
+                            <div class="weather-merge-rules">
                                 <span>统一场站位置</span>
                                 <span>统一时间基准</span>
                                 <span>统一变量与单位</span>
@@ -3469,49 +3517,31 @@
                             </div>
                         </section>
 
-                        <section class="exogenous-output-panel" aria-live="polite">
-                            <div class="exogenous-output-head">
-                                <div>
-                                    <span>统一输出</span>
-                                    <strong>场站级外生变量</strong>
-                                    <small>覆盖历史、当前与未来的环境信息序列</small>
-                                </div>
-                                <b class="exogenous-key-badge">预测性能关键输入</b>
+                        <section class="weather-unified-output" aria-live="polite">
+                            <div class="weather-output-heading">
+                                <div><span class="weather-eyebrow">统一输出</span><h4>场站级外生变量</h4></div>
+                                <span class="weather-output-pill">预测性能关键输入</span>
                             </div>
-
-                            <div class="exogenous-timeline" aria-label="从历史实测到未来预报的时间轴">
-                                <div class="exogenous-timeline-segment exogenous-timeline-history">
-                                    <strong>微气象站实测</strong>
-                                    <small>历史 ─ 当前</small>
-                                </div>
-                                <div class="exogenous-timeline-now"><span>现在</span><i></i></div>
-                                <div class="exogenous-timeline-segment exogenous-timeline-future">
-                                    <strong>NWP 降尺度预报</strong>
-                                    <small>未来 0–24 h</small>
-                                </div>
+                            <div class="weather-output-copy">覆盖历史、当前与未来的环境信息序列</div>
+                            <div class="weather-output-source">
+                                <div class="weather-now-source">微气象站实测<br><small>历史 → 当前</small></div>
+                                <span class="weather-output-axis">现在</span>
+                                <div class="weather-future-source">NWP 降尺度预报<br><small>未来 0–24 h</small></div>
                             </div>
-
-                            <div class="exogenous-variable-table" aria-label="场站级外生变量示例">
-                                <div class="exogenous-variable-row"><span>变量</span><span>当前实测</span><span>未来趋势</span></div>
-                                <div class="exogenous-variable-row"><strong>空气温度</strong><b data-exo-current="temperature">25.2 °C</b><em data-exo-future="temperature">24.8 → 23.9 °C</em></div>
-                                <div class="exogenous-variable-row"><strong>风速</strong><b data-exo-current="wind">0.0 m/s</b><em data-exo-future="wind">0.8 → 2.4 m/s</em></div>
-                                <div class="exogenous-variable-row"><strong>总辐照</strong><b data-exo-current="radiation">2.0 W/m²</b><em data-exo-future="radiation">38 → 126 W/m²</em></div>
-                                <div class="exogenous-variable-row"><strong>累计雨量</strong><b data-exo-current="rain">2.1 mm</b><em data-exo-future="rain">2.1 → 2.1 mm</em></div>
+                            <div class="weather-output-table">
+                                <div class="weather-output-row"><span>空气温度</span><strong data-weather-value="temperature">25.2 °C</strong><b data-weather-future="temperature">24.8 → 23.9 °C</b></div>
+                                <div class="weather-output-row"><span>风速</span><strong data-weather-value="wind">0.0 m/s</strong><b data-weather-future="wind">0.8 → 2.4 m/s</b></div>
+                                <div class="weather-output-row"><span>总辐照</span><strong data-weather-value="radiation">2 W/m²</strong><b data-weather-future="radiation">38 → 126 W/m²</b></div>
+                                <div class="weather-output-row"><span>累计雨量</span><strong data-weather-value="rain">2.1 mm</strong><b data-weather-future="rain">2.1 → 2.1 mm</b></div>
                             </div>
-
-                            <div class="exogenous-downstream">
-                                <span>贯穿后续智能体链路</span>
-                                <div class="exogenous-downstream-list">
-                                    <b>数据治理 · 异常判断</b>
-                                    <b>AutoML · 方案决策</b>
-                                    <b>预测 Agent · 扰动响应</b>
-                                    <b>解释诊断 · 偏差归因</b>
-                                </div>
+                            <div class="weather-chain">
+                                <strong>贯穿后续智能体链路</strong>
+                                <div class="weather-chain-grid"><span>数据治理 · 异常判断</span><span>AutoML · 方案决策</span><span>预测 Agent · 扰动响应</span><span>解释诊断 · 偏差归因</span></div>
                             </div>
                         </section>
                     </div>
 
-                    <div class="exogenous-source-hint">点击任一来源可突出其对应时间段，再次点击恢复双源汇聚视图；上方状态用于模拟微气象站实况变化。</div>
+                    <p class="weather-demo-hint">点击任一来源可突出其对应时间段，再点击中间汇聚区恢复双源总览；上方状态用于模拟微气象站实况变化。</p>
                 </div>
             `;
         }
@@ -3530,14 +3560,12 @@
                     radiation: 2,
                     soil: 6.6,
                     rain: 2.1,
+                    futureTemperature: '24.8 → 23.9 °C',
+                    futureWind: '0.8 → 2.4 m/s',
+                    futureRadiation: '38 → 126 W/m²',
+                    futureRain: '2.1 → 2.1 mm',
                     status: '数据状态：正常',
-                    camera: '图像通道：可用',
-                    future: {
-                        temperature: '24.8 → 23.9 °C',
-                        wind: '0.8 → 2.4 m/s',
-                        radiation: '38 → 126 W/m²',
-                        rain: '2.1 → 2.1 mm'
-                    }
+                    camera: '图像通道：可用'
                 },
                 lowRadiation: {
                     state: '低辐照',
@@ -3548,14 +3576,12 @@
                     radiation: 1,
                     soil: 6.7,
                     rain: 2.1,
+                    futureTemperature: '24.3 → 22.8 °C',
+                    futureWind: '1.1 → 3.2 m/s',
+                    futureRadiation: '18 → 72 W/m²',
+                    futureRain: '2.1 → 2.4 mm',
                     status: '数据状态：低辐照',
-                    camera: '图像通道：可用',
-                    future: {
-                        temperature: '24.4 → 23.6 °C',
-                        wind: '1.1 → 2.8 m/s',
-                        radiation: '12 → 82 W/m²',
-                        rain: '2.1 → 2.3 mm'
-                    }
+                    camera: '图像通道：可用'
                 },
                 soilDry: {
                     state: '土壤干燥',
@@ -3566,14 +3592,12 @@
                     radiation: 3,
                     soil: 5.8,
                     rain: 2.1,
+                    futureTemperature: '25.1 → 24.4 °C',
+                    futureWind: '0.6 → 1.7 m/s',
+                    futureRadiation: '52 → 148 W/m²',
+                    futureRain: '2.1 → 2.1 mm',
                     status: '数据状态：土壤干燥',
-                    camera: '图像通道：可用',
-                    future: {
-                        temperature: '25.1 → 24.2 °C',
-                        wind: '0.9 → 2.1 m/s',
-                        radiation: '46 → 158 W/m²',
-                        rain: '2.1 → 2.1 mm'
-                    }
+                    camera: '图像通道：可用'
                 },
                 rain: {
                     state: '降雨状态',
@@ -3584,14 +3608,12 @@
                     radiation: 1,
                     soil: 7.4,
                     rain: 3.2,
+                    futureTemperature: '23.8 → 22.5 °C',
+                    futureWind: '1.8 → 4.6 m/s',
+                    futureRadiation: '12 → 35 W/m²',
+                    futureRain: '3.2 → 8.6 mm',
                     status: '数据状态：降雨中',
-                    camera: '图像通道：辅助观测',
-                    future: {
-                        temperature: '23.8 → 22.7 °C',
-                        wind: '1.6 → 3.7 m/s',
-                        radiation: '4 → 26 W/m²',
-                        rain: '3.5 → 4.8 mm'
-                    }
+                    camera: '图像通道：辅助观测'
                 }
             };
 
@@ -3621,14 +3643,10 @@
                 setText('[data-weather-value="radiation"]', radiation.toFixed(1) + ' W/m²');
                 setText('[data-weather-value="soil"]', soil.toFixed(1) + ' %');
                 setText('[data-weather-value="rain"]', rain.toFixed(1) + ' mm');
-                setText('[data-exo-current="temperature"]', temperature.toFixed(1) + ' °C');
-                setText('[data-exo-current="wind"]', wind.toFixed(1) + ' m/s');
-                setText('[data-exo-current="radiation"]', radiation.toFixed(1) + ' W/m²');
-                setText('[data-exo-current="rain"]', rain.toFixed(1) + ' mm');
-                setText('[data-exo-future="temperature"]', current.future.temperature);
-                setText('[data-exo-future="wind"]', current.future.wind);
-                setText('[data-exo-future="radiation"]', current.future.radiation);
-                setText('[data-exo-future="rain"]', current.future.rain);
+                setText('[data-weather-future="temperature"]', current.futureTemperature);
+                setText('[data-weather-future="wind"]', current.futureWind);
+                setText('[data-weather-future="radiation"]', current.futureRadiation);
+                setText('[data-weather-future="rain"]', current.futureRain);
                 setText('[data-weather-status]', current.status);
                 setText('[data-weather-camera]', current.camera);
                 setText('[data-weather-quality]', '有效性标记：有效');
@@ -3638,15 +3656,28 @@
                     root.classList.remove('is-updating');
                     void root.offsetWidth;
                     root.classList.add('is-updating');
+                    window.clearTimeout(root._weatherValueTimer);
+                    root._weatherValueTimer = window.setTimeout(function () {
+                        root.classList.remove('is-updating');
+                    }, 520);
                 }
                 tick += 1;
             }
 
             function showCase(caseId) {
                 activeCase = caseId;
+                root.dataset.weatherCase = caseId;
                 root.querySelectorAll('[data-weather-case]').forEach(function (button) {
                     button.classList.toggle('active', button.dataset.weatherCase === caseId);
+                    button.setAttribute('aria-pressed', button.dataset.weatherCase === caseId ? 'true' : 'false');
                 });
+                root.classList.remove('case-changing');
+                void root.offsetWidth;
+                root.classList.add('case-changing');
+                window.clearTimeout(root._weatherCaseTimer);
+                root._weatherCaseTimer = window.setTimeout(function () {
+                    root.classList.remove('case-changing');
+                }, 600);
                 refreshValues(true);
             }
 
@@ -3656,22 +3687,54 @@
                 });
             });
 
-            root.querySelectorAll('[data-exo-source]').forEach(function (button) {
-                button.addEventListener('click', function () {
-                    const source = button.dataset.exoSource;
-                    const nextFocus = root.dataset.sourceFocus === source ? 'all' : source;
-                    root.dataset.sourceFocus = nextFocus;
-                    root.querySelectorAll('[data-exo-source]').forEach(function (sourceButton) {
-                        sourceButton.setAttribute('aria-pressed', String(nextFocus === sourceButton.dataset.exoSource));
-                    });
+            function focusSource(source, animate) {
+                const focused = source !== 'all';
+                root.dataset.sourceFocus = source;
+                root.classList.toggle('has-focus', focused);
+                root.classList.remove('is-updating');
+                window.clearTimeout(root._weatherValueTimer);
+                root.querySelectorAll('.weather-source-card').forEach(function (card) {
+                    const isActive = focused && card.dataset.weatherSource === source;
+                    card.classList.toggle('is-focused', isActive);
+                    card.setAttribute('aria-pressed', isActive ? 'true' : 'false');
+                });
+                root.classList.remove('source-changing');
+                window.clearTimeout(root._weatherSourceTimer);
+                if (animate && focused) {
+                    void root.offsetWidth;
+                    root.classList.add('source-changing');
+                    root._weatherSourceTimer = window.setTimeout(function () {
+                        root.classList.remove('source-changing');
+                    }, 680);
+                }
+            }
+
+            root.querySelectorAll('.weather-source-card').forEach(function (card) {
+                card.addEventListener('click', function () { focusSource(card.dataset.weatherSource, true); });
+                card.addEventListener('keydown', function (event) {
+                    if (event.key === 'Enter' || event.key === ' ') {
+                        event.preventDefault();
+                        focusSource(card.dataset.weatherSource, true);
+                    }
                 });
             });
 
+            const mergePanel = root.querySelector('.weather-merge-panel');
+            function restoreSourceOverview() {
+                focusSource('all', false);
+            }
+            mergePanel.addEventListener('click', restoreSourceOverview);
+            mergePanel.addEventListener('keydown', function (event) {
+                if (event.key === 'Enter' || event.key === ' ') {
+                    event.preventDefault();
+                    restoreSourceOverview();
+                }
+            });
+
+            focusSource('all', false);
             showCase('normal');
             if (weatherStationTimer) window.clearInterval(weatherStationTimer);
-            weatherStationTimer = window.setInterval(function () {
-                refreshValues(false);
-            }, 2000);
+            weatherStationTimer = null;
         }
 
         function renderDataLab() {
