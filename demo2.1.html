@@ -178,6 +178,47 @@
             font-weight: bold;
         }
 
+        .side-action-item {
+            appearance: none;
+            color: inherit;
+            font: inherit;
+            cursor: pointer;
+            transition: transform 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease, background 0.2s ease;
+        }
+
+        .side-action-item:hover,
+        .side-action-item:focus-visible {
+            transform: translateY(-2px);
+            border-color: var(--primary-color);
+            background: #fff;
+            box-shadow: 0 7px 16px rgba(138, 28, 82, 0.12);
+            outline: none;
+        }
+
+        #panel-output .side-action-item:hover,
+        #panel-output .side-action-item:focus-visible {
+            border-color: var(--output-border);
+            box-shadow: 0 7px 16px rgba(217, 119, 6, 0.14);
+        }
+
+        .side-badge {
+            display: inline-block;
+            margin-top: 5px;
+            border-radius: 999px;
+            background: #fdf2f8;
+            padding: 2px 5px;
+            color: var(--primary-color);
+            font-size: 0.49rem;
+            font-weight: 850;
+            line-height: 1.2;
+            white-space: nowrap;
+        }
+
+        #panel-output .side-badge {
+            background: #fff7ed;
+            color: #b45309;
+        }
+
         #panel-input {
             top: 50%;
             left: 10px;
@@ -1744,6 +1785,70 @@
             to { opacity: 1; transform: translateX(0); }
         }
 
+        /* 输入与交付物介绍 */
+        .info-module-flow {
+            display: grid;
+            grid-template-columns: repeat(3, minmax(0, 1fr));
+            gap: 14px;
+            margin-top: 18px;
+        }
+
+        .info-module-card {
+            position: relative;
+            min-height: 150px;
+            border: 1px solid #e2e8f0;
+            border-top: 4px solid var(--info-accent, var(--primary-color));
+            border-radius: 12px;
+            background: #fff;
+            padding: 18px 14px;
+            box-shadow: 0 8px 20px rgba(15, 23, 42, 0.06);
+            color: #64748b;
+            text-align: center;
+            font-size: 0.76rem;
+            line-height: 1.55;
+        }
+
+        .info-module-card .info-icon {
+            display: block;
+            margin-bottom: 8px;
+            font-size: 1.6rem;
+        }
+
+        .info-module-card strong {
+            display: block;
+            margin-bottom: 6px;
+            color: var(--text-main);
+            font-size: 0.92rem;
+        }
+
+        .info-module-card:not(:last-child)::after {
+            content: '→';
+            position: absolute;
+            right: -21px;
+            top: 50%;
+            z-index: 2;
+            transform: translateY(-50%);
+            color: var(--info-accent, var(--primary-color));
+            font-size: 1.25rem;
+            font-weight: 900;
+        }
+
+        .info-module-example {
+            margin-top: 14px;
+            border: 1px solid rgba(138, 28, 82, 0.18);
+            border-radius: 10px;
+            background: linear-gradient(90deg, #fdf2f8, #fff7ed);
+            padding: 12px 14px;
+            color: #475569;
+            text-align: center;
+            font-size: 0.78rem;
+            font-weight: 700;
+        }
+
+        .info-module-example strong {
+            color: var(--primary-color);
+        }
+
         /* 预测动画 */
         .prediction-flow {
             grid-template-columns: 180px 70px 1fr;
@@ -3062,6 +3167,9 @@
             .governance-stage { grid-template-columns: 1fr; }
             .feedback-module-flow { grid-template-columns: repeat(2, 1fr); }
             .feedback-stage-card::after { display: none; }
+            .info-module-flow { grid-template-columns: 1fr; }
+            .info-module-card { min-height: 0; }
+            .info-module-card::after { display: none; }
             .routes-panel { grid-template-columns: 1fr 1fr; grid-template-rows: none; }
             .forecast-model-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
             .forecast-chart-head { align-items: flex-start; flex-direction: column; }
@@ -3117,10 +3225,11 @@
                 <!-- 左侧：输入 -->
                 <div class="side-panel" id="panel-input">
                     <div class="side-title">输入</div>
-                    <div class="side-item">
+                    <button class="side-item side-action-item" type="button" onclick="openModule('timeseries')" aria-label="查看时序数据内生变量介绍">
                         <div class="side-icon">📈</div>
                         <div class="side-text">时序数据</div>
-                    </div>
+                        <div class="side-badge">内生变量</div>
+                    </button>
                     <button class="side-item weather-source-entry" type="button" onclick="openModule('weather')" aria-label="查看多源外生变量详情">
                         <span class="weather-live-dot" aria-hidden="true"></span>
                         <div class="weather-source-heading">
@@ -3149,10 +3258,11 @@
                         </div>
                         <div class="weather-source-footer">软硬件一体 / 系统亮点</div>
                     </button>
-                    <div class="side-item" style="margin-bottom: 0;">
+                    <button class="side-item side-action-item" type="button" onclick="openModule('target')" aria-label="查看任务目标介绍" style="margin-bottom: 0;">
                         <div class="icon-p">P</div>
                         <div class="side-text">任务目标</div>
-                    </div>
+                        <div class="side-badge">未来 1 天风速</div>
+                    </button>
                 </div>
 
                 <div class="loop-border">
@@ -3208,14 +3318,16 @@
                 <!-- 右侧：输出 -->
                 <div class="side-panel" id="panel-output">
                     <div class="side-title">输出</div>
-                    <div class="side-item">
+                    <button class="side-item side-action-item" type="button" onclick="openModule('forecast-output')" aria-label="查看预测输出结果介绍">
                         <div class="side-icon">📉</div>
-                        <div class="side-text">预测结果</div>
-                    </div>
-                    <div class="side-item" style="margin-bottom: 0;">
+                        <div class="side-text">预测输出<br>结果</div>
+                        <div class="side-badge">曲线与区间</div>
+                    </button>
+                    <button class="side-item side-action-item" type="button" onclick="openModule('summary-doc')" aria-label="查看总结文档介绍" style="margin-bottom: 0;">
                         <div class="side-icon">📄</div>
                         <div class="side-text">总结文档</div>
-                    </div>
+                        <div class="side-badge">全链路记录</div>
+                    </button>
                 </div>
 
                 <!-- 连接线 -->
@@ -3292,6 +3404,16 @@
     <script>
         // 模块弹窗业务数据
         const modulesData = {
+            'timeseries': {
+                title: "时序数据 · 内生变量",
+                value: "本模块汇集场站内部持续产生的历史出力、设备运行状态和控制记录，形成可按时间对齐的内生变量数据。解决运行数据分散、时间口径不统一、历史规律难以直接用于预测的问题。",
+                visual: renderTimeSeriesIntro
+            },
+            'target': {
+                title: "任务目标",
+                value: "本模块用于明确本次预测要回答的问题，包括预测对象、未来时间范围、时间粒度和交付频率。例如：预测未来 1 天的风速，并按 15 分钟粒度输出结果。解决需求描述模糊、不同人员理解不一致、预测结果无法直接用于业务的问题。",
+                visual: renderTargetIntro
+            },
             'weather': {
                 title: "多源外生环境信息",
                 value: "本模块汇聚明月•万象多模态微气象站的局地实况与 NWP 降尺度形成的场站级未来预报，构建覆盖历史、当前和未来的场站级外生变量。让系统既能感知正在发生的环境变化，也能提前响应未来气象扰动，为数据治理、方案决策、出力预测和误差归因提供关键依据。",
@@ -3321,6 +3443,16 @@
                 title: "闭环反馈",
                 value: "本模块持续接收实际出力和运行结果，形成问题回流、任务调整和效果验证闭环。解决模型上线后缺少持续跟踪、问题修复不及时、预测能力难以长期保持的问题。",
                 visual: renderFeedbackLab
+            },
+            'forecast-output': {
+                title: "预测输出结果",
+                value: "本模块将预测 Agent 的结果整理为可直接使用的预测曲线、可信区间和关键指标，并按照任务要求输出对应时间范围和粒度的数据。解决预测结果格式不统一、风险边界不清晰、调度与运营人员难以快速使用的问题。",
+                visual: renderForecastOutputIntro
+            },
+            'summary-doc': {
+                title: "总结文档",
+                value: "本模块自动汇总数据质量、任务目标、方案选择、训练与预测日志、结果指标及误差诊断，形成可下载、可复核的全链路文档。解决预测过程难追踪、决策依据难说明、项目交付依赖人工整理的问题。",
+                visual: renderSummaryDocIntro
             }
         };
 
@@ -3894,6 +4026,86 @@
                 '  <div class="lab-status"><span>运行结果持续回流</span><strong>问题有记录、调整有依据、效果可验证</strong></div>',
                 '</div>'
             ].join('');
+        }
+
+        function renderInfoIntro(config) {
+            const cards = config.cards.map(function (card) {
+                return '<div class="info-module-card">' +
+                    '<span class="info-icon">' + card.icon + '</span>' +
+                    '<strong>' + card.title + '</strong>' +
+                    card.copy +
+                '</div>';
+            }).join('');
+            const example = config.example
+                ? '<div class="info-module-example">' + config.example + '</div>'
+                : '';
+            return '<div class="module-lab info-module-lab" style="--info-accent:' + config.accent + '">' +
+                '<div class="lab-toolbar"><div><div class="lab-kicker">' + config.kicker + '</div><strong>' + config.headline + '</strong></div></div>' +
+                '<div class="info-module-flow">' + cards + '</div>' +
+                example +
+                '<div class="lab-status"><span>' + config.statusLabel + '</span><strong>' + config.statusValue + '</strong></div>' +
+            '</div>';
+        }
+
+        function renderTimeSeriesIntro() {
+            return renderInfoIntro({
+                accent: '#8a1c52',
+                kicker: 'Endogenous Time-series Input',
+                headline: '记录场站自身的历史运行过程，形成可用于预测的内生变量',
+                cards: [
+                    { icon: '📡', title: '场站内部信号', copy: '历史出力、设备状态、控制记录等持续回流。' },
+                    { icon: '🕒', title: '统一时间口径', copy: '按照统一时间轴组织数据，便于跨设备和跨时段比较。' },
+                    { icon: '🧩', title: '内生变量数据集', copy: '沉淀场站自身的运行规律，作为预测任务的基础输入。' }
+                ],
+                statusLabel: '输入角色',
+                statusValue: '描述场站过去发生了什么'
+            });
+        }
+
+        function renderTargetIntro() {
+            return renderInfoIntro({
+                accent: '#7c3aed',
+                kicker: 'Prediction Task Definition',
+                headline: '把业务需求转化为清晰、可执行、可验收的预测任务',
+                cards: [
+                    { icon: '🎯', title: '预测对象', copy: '明确预测风速、风电出力、光伏出力或其他目标。' },
+                    { icon: '📅', title: '预测范围', copy: '明确从当前时刻向未来预测多长时间。' },
+                    { icon: '⏱️', title: '结果粒度', copy: '明确时间间隔、更新频率和结果交付要求。' }
+                ],
+                example: '任务示例：<strong>预测未来 1 天的风速</strong>，每 15 分钟输出一个预测值',
+                statusLabel: '任务定义完成',
+                statusValue: '预测对象、时间范围与输出口径保持一致'
+            });
+        }
+
+        function renderForecastOutputIntro() {
+            return renderInfoIntro({
+                accent: '#d97706',
+                kicker: 'Forecast Deliverable',
+                headline: '把预测结果整理为调度与运营人员可直接使用的业务交付物',
+                cards: [
+                    { icon: '📈', title: '预测曲线', copy: '按任务要求给出未来各时刻的预测值。' },
+                    { icon: '🛡️', title: '可信范围', copy: '同步展示上下边界，帮助识别可能的波动风险。' },
+                    { icon: '📤', title: '标准化输出', copy: '按统一时间粒度和格式交付，便于业务系统直接使用。' }
+                ],
+                statusLabel: '核心交付',
+                statusValue: '预测值、可信区间与关键指标口径一致'
+            });
+        }
+
+        function renderSummaryDocIntro() {
+            return renderInfoIntro({
+                accent: '#0f766e',
+                kicker: 'Traceable Summary Document',
+                headline: '自动沉淀从输入、决策到结果与诊断的全链路记录',
+                cards: [
+                    { icon: '🗂️', title: '输入与任务摘要', copy: '记录数据范围、数据质量和本次任务目标。' },
+                    { icon: '🧭', title: '方案与执行记录', copy: '记录方案选择依据、训练日志和预测日志。' },
+                    { icon: '📄', title: '结果与诊断结论', copy: '汇总预测指标、偏差归因和后续改进建议。' }
+                ],
+                statusLabel: '文档价值',
+                statusValue: '链路可追溯、决策可复核、结果可交付'
+            });
         }
 
 
