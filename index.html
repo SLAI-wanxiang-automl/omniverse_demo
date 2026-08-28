@@ -94,15 +94,16 @@
             display: flex;
             justify-content: center;
             margin-bottom: 20px;
-            transform: scale(0.85);
-            /* 缩放画布以适应屏幕宽度 */
+            --canvas-scale: 0.88;
+            transform: scale(var(--canvas-scale));
             transform-origin: top center;
+            will-change: transform;
         }
 
         .canvas {
             position: relative;
-            width: 1420px;
-            flex: 0 0 1420px;
+            width: 1480px;
+            flex: 0 0 1480px;
             height: 620px;
         }
 
@@ -163,21 +164,6 @@
             background: #f8fafc;
         }
 
-        .side-item:last-child {
-            margin-bottom: 0;
-        }
-
-        .side-icon {
-            font-size: 1.8rem;
-            margin-bottom: 2px;
-        }
-
-        .side-text {
-            font-size: 0.75rem;
-            color: #475569;
-            font-weight: bold;
-        }
-
         .side-action-item {
             appearance: none;
             color: inherit;
@@ -201,30 +187,28 @@
             box-shadow: 0 7px 16px rgba(217, 119, 6, 0.14);
         }
 
-        .side-badge {
-            display: inline-block;
-            margin-top: 5px;
-            border-radius: 999px;
-            background: #fdf2f8;
-            padding: 2px 5px;
-            color: var(--primary-color);
-            font-size: 0.49rem;
-            font-weight: 850;
-            line-height: 1.2;
-            white-space: nowrap;
+        .side-item:last-child {
+            margin-bottom: 0;
         }
 
-        #panel-output .side-badge {
-            background: #fff7ed;
-            color: #b45309;
+        .side-icon {
+            font-size: 1.8rem;
+            margin-bottom: 2px;
+        }
+
+        .side-text {
+            font-size: 0.75rem;
+            color: #475569;
+            font-weight: bold;
         }
 
         #panel-input {
-            top: 50%;
-            left: 10px;
-            width: 212px;
-            transform: translateY(-50%);
+            top: 55px;
+            left: 28px;
+            width: 184px;
+            height: 520px;
             border-color: var(--input-border);
+            padding: 16px 9px;
         }
 
         #panel-input .side-title {
@@ -240,17 +224,19 @@
         }
 
         #panel-input>.side-item:not(.weather-source-entry) {
-            padding: 7px;
+            min-height: 88px;
+            padding: 9px 6px;
+            width: 100%;
         }
 
         #panel-input>.side-item:not(.weather-source-entry) .side-icon {
-            font-size: 1.55rem;
+            font-size: 1.38rem;
         }
 
         #panel-input>.side-item:not(.weather-source-entry) .icon-p {
-            width: 28px;
-            height: 28px;
-            font-size: 0.9rem;
+            width: 26px;
+            height: 26px;
+            font-size: 0.84rem;
         }
 
         .weather-source-entry {
@@ -259,8 +245,8 @@
             display: flex;
             flex-direction: column;
             align-items: center;
-            gap: 8px;
-            padding: 10px 10px 12px;
+            gap: 5px;
+            padding: 8px 8px 9px;
             appearance: none;
             font: inherit;
             cursor: pointer;
@@ -281,8 +267,8 @@
         .weather-source-entry::after {
             content: '点击查看';
             position: absolute;
-            right: -7px;
-            top: -7px;
+            right: 5px;
+            top: 5px;
             padding: 2px 5px;
             border-radius: 999px;
             background: var(--primary-color);
@@ -292,105 +278,120 @@
             letter-spacing: 0.02em;
         }
 
-        .weather-source-heading {
-            width: 100%;
-            text-align: center;
-        }
-
-        .weather-source-heading span,
-        .weather-source-heading strong {
-            display: block;
-        }
-
-        .weather-source-heading span {
-            color: var(--text-muted);
-            font-size: 0.54rem;
-            font-weight: 750;
-        }
-
-        .weather-source-heading strong {
-            margin-top: 1px;
+        .input-item-note {
+            display: inline-block;
+            margin-top: 7px;
+            border-radius: 999px;
+            background: #fdf2f8;
+            padding: 3px 6px;
             color: var(--primary-color);
-            font-size: 0.82rem;
-            letter-spacing: 0.02em;
+            font-size: 0.53rem;
+            font-weight: 850;
+            line-height: 1.15;
+            white-space: nowrap;
         }
 
         .weather-source-grid {
-            display: grid;
-            grid-template-columns: repeat(2, minmax(0, 1fr));
-            gap: 7px;
             width: 100%;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 6px;
         }
 
-        .weather-input-source-card {
+        .weather-source-card-mini {
             min-width: 0;
             overflow: hidden;
-            border: 1px solid rgba(138, 28, 82, 0.22);
-            border-radius: 10px;
-            background: rgba(255, 255, 255, 0.9);
-            box-shadow: 0 4px 10px rgba(15, 23, 42, 0.07);
+            border: 1px solid rgba(138, 28, 82, 0.14);
+            border-radius: 9px;
+            background: rgba(255, 255, 255, 0.74);
+            box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.35);
         }
 
-        .weather-input-source-card[data-source="b"] {
-            border-color: rgba(37, 99, 235, 0.28);
+        .weather-source-card-mini:nth-child(2) {
+            border-color: rgba(59, 130, 246, 0.2);
         }
 
-        .weather-source-media {
-            height: 72px;
-            padding: 4px;
-            border-bottom: 1px solid rgba(138, 28, 82, 0.12);
-            background: linear-gradient(145deg, #f8fafc, #fdf2f8);
+        .weather-source-preview {
+            width: 100%;
+            height: 56px;
+            border-radius: 8px 8px 0 0;
+            overflow: hidden;
+            background: #e2e8f0;
         }
 
-        .weather-input-source-card[data-source="b"] .weather-source-media {
-            border-bottom-color: rgba(37, 99, 235, 0.14);
-            background: linear-gradient(145deg, #eff6ff, #ecfeff);
-        }
-
-        .weather-source-media img {
-            display: block;
+        .weather-source-preview img {
             width: 100%;
             height: 100%;
-            object-fit: contain;
-        }
-
-        .weather-source-copy {
-            min-height: 46px;
-            padding: 5px 3px 6px;
-            text-align: center;
-        }
-
-        .weather-source-copy span,
-        .weather-source-copy strong {
+            object-fit: cover;
             display: block;
         }
 
-        .weather-source-copy span {
-            color: #9d174d;
-            font-size: 0.48rem;
-            font-weight: 900;
-            letter-spacing: 0.04em;
+        .weather-source-mini-label {
+            display: block;
+            padding: 4px 3px 5px;
+            color: #7f1d4c;
+            font-size: 0.52rem;
+            font-weight: 800;
+            line-height: 1.15;
         }
 
-        .weather-input-source-card[data-source="b"] .weather-source-copy span {
+        .weather-source-card-mini:nth-child(2) .weather-source-mini-label {
             color: #1d4ed8;
         }
 
-        .weather-source-copy strong {
-            margin-top: 2px;
-            color: #334155;
-            font-size: 0.51rem;
-            line-height: 1.25;
+        .weather-source-label {
+            width: 100%;
+            margin-top: 0;
+            padding-top: 5px;
+            border-top: 1px dashed rgba(138, 28, 82, 0.28);
+            color: var(--primary-color);
+            line-height: 1.15;
         }
 
-        .weather-source-footer {
-            width: 100%;
-            padding-top: 6px;
-            border-top: 1px dashed rgba(138, 28, 82, 0.25);
+        .weather-source-label span,
+        .weather-source-label small,
+        .weather-source-label strong {
+            display: block;
+        }
+
+        .weather-source-label span {
+            margin-bottom: 2px;
             color: var(--text-muted);
             font-size: 0.52rem;
-            font-weight: 750;
+            font-weight: 700;
+        }
+
+        .weather-source-label strong {
+            font-size: 0.66rem;
+            letter-spacing: 0.02em;
+        }
+
+        .weather-source-label small {
+            margin-top: 4px;
+            font-size: 0.52rem;
+            font-weight: 700;
+        }
+
+        .weather-source-lines {
+            width: 100%;
+            display: grid;
+            gap: 3px;
+            margin-top: 3px;
+        }
+
+        .weather-source-line {
+            padding: 4px 5px;
+            border-radius: 7px;
+            background: rgba(138, 28, 82, 0.08);
+            color: #7f1d4c;
+            font-size: 0.51rem;
+            font-weight: 800;
             text-align: center;
+        }
+
+        .weather-source-line:nth-child(2) {
+            background: rgba(59, 130, 246, 0.08);
+            color: #1d4ed8;
         }
 
         .weather-live-dot {
@@ -426,8 +427,8 @@
 
         #panel-output {
             top: 160px;
-            left: 1320px;
-            width: 100px;
+            left: 1340px;
+            width: 116px;
             border-color: var(--output-border);
             padding: 30px 10px;
         }
@@ -437,8 +438,15 @@
         }
 
         #panel-output .side-item {
-            width: 80px;
+            width: 92px;
+            min-height: 112px;
+            padding: 12px 7px;
             margin-bottom: 40px;
+        }
+
+        #panel-output .input-item-note {
+            background: #fff7ed;
+            color: #b45309;
         }
 
         /* 核心模块节点 (可点击 Agent) */
@@ -625,8 +633,8 @@
         /* 线条具体定位 */
         #line0 {
             top: 285px;
-            left: 222px;
-            width: 48px;
+            left: 212px;
+            width: 58px;
             height: 3px;
         }
 
@@ -682,7 +690,7 @@
         #line-out1 {
             top: 190px;
             left: 1295px;
-            width: 25px;
+            width: 45px;
             height: 3px;
         }
 
@@ -696,7 +704,7 @@
         #line-out2 {
             top: 390px;
             left: 1295px;
-            width: 25px;
+            width: 45px;
             height: 3px;
         }
 
@@ -1790,17 +1798,17 @@
             display: grid;
             grid-template-columns: repeat(3, minmax(0, 1fr));
             gap: 14px;
-            margin-top: 18px;
+            margin-top: 14px;
         }
 
         .info-module-card {
             position: relative;
-            min-height: 150px;
+            min-height: 126px;
             border: 1px solid #e2e8f0;
             border-top: 4px solid var(--info-accent, var(--primary-color));
             border-radius: 12px;
             background: #fff;
-            padding: 18px 14px;
+            padding: 15px 14px;
             box-shadow: 0 8px 20px rgba(15, 23, 42, 0.06);
             color: #64748b;
             text-align: center;
@@ -1810,7 +1818,7 @@
 
         .info-module-card .info-icon {
             display: block;
-            margin-bottom: 8px;
+            margin-bottom: 6px;
             font-size: 1.6rem;
         }
 
@@ -1834,11 +1842,11 @@
         }
 
         .info-module-example {
-            margin-top: 14px;
+            margin-top: 12px;
             border: 1px solid rgba(138, 28, 82, 0.18);
             border-radius: 10px;
             background: linear-gradient(90deg, #fdf2f8, #fff7ed);
-            padding: 12px 14px;
+            padding: 10px 14px;
             color: #475569;
             text-align: center;
             font-size: 0.78rem;
@@ -1847,6 +1855,12 @@
 
         .info-module-example strong {
             color: var(--primary-color);
+        }
+
+        .modal-content.info-modal .modal-visual {
+            min-height: 0;
+            padding: 16px 18px;
+            margin-bottom: 18px;
         }
 
         /* 预测动画 */
@@ -3225,43 +3239,42 @@
                 <!-- 左侧：输入 -->
                 <div class="side-panel" id="panel-input">
                     <div class="side-title">输入</div>
-                    <button class="side-item side-action-item" type="button" onclick="openModule('timeseries')" aria-label="查看时序数据内生变量介绍">
+                    <button class="side-item side-action-item" type="button" onclick="openModule('timeseries')" aria-label="查看历史出力时序数据介绍">
                         <div class="side-icon">📈</div>
-                        <div class="side-text">时序数据</div>
-                        <div class="side-badge">内生变量</div>
+                        <div class="side-text">历史出力时序数据</div>
+                        <small class="input-item-note">内生变量</small>
                     </button>
-                    <button class="side-item weather-source-entry" type="button" onclick="openModule('weather')" aria-label="查看多源外生变量详情">
+                    <button class="side-item weather-source-entry" type="button" onclick="openModule('weather')" aria-label="查看明月•万象多模态微气象站详情">
                         <span class="weather-live-dot" aria-hidden="true"></span>
-                        <div class="weather-source-heading">
+                        <div class="weather-source-grid" aria-hidden="true">
+                            <div class="weather-source-card-mini">
+                                <div class="weather-source-preview">
+                                    <img src="scene/weather-station.png" alt="">
+                                </div>
+                                <span class="weather-source-mini-label">微气象站<br>实测采集</span>
+                            </div>
+                            <div class="weather-source-card-mini">
+                                <div class="weather-source-preview">
+                                    <img src="scene/nwp-forecast.svg" alt="">
+                                </div>
+                                <span class="weather-source-mini-label">NWP<br>降尺度预报</span>
+                            </div>
+                        </div>
+                        <div class="side-icon">🌦️</div>
+                        <div class="side-text">外生变量可拔插</div>
+                        <div class="weather-source-label">
                             <span>双来源输入</span>
-                            <strong>外生变量</strong>
-                        </div>
-                        <div class="weather-source-grid">
-                            <div class="weather-input-source-card" data-source="a">
-                                <div class="weather-source-media">
-                                    <img src="assets/micro-weather-station.svg" alt="明月•万象多模态微气象站">
-                                </div>
-                                <div class="weather-source-copy">
-                                    <span>来源 A</span>
-                                    <strong>微气象站采集</strong>
-                                </div>
+                            <div class="weather-source-lines">
+                                <div class="weather-source-line">来源 A：微气象站采集</div>
+                                <div class="weather-source-line">来源 B：NWP + ML 降尺度</div>
                             </div>
-                            <div class="weather-input-source-card" data-source="b">
-                                <div class="weather-source-media">
-                                    <img src="assets/nwp-ml-downscaling.svg" alt="NWP 经机器学习降尺度形成场站精细气象信息">
-                                </div>
-                                <div class="weather-source-copy">
-                                    <span>来源 B</span>
-                                    <strong>NWP + ML 降尺度</strong>
-                                </div>
-                            </div>
+                            <small>按需接入 / 灵活扩展</small>
                         </div>
-                        <div class="weather-source-footer">软硬件一体 / 系统亮点</div>
                     </button>
                     <button class="side-item side-action-item" type="button" onclick="openModule('target')" aria-label="查看任务目标介绍" style="margin-bottom: 0;">
                         <div class="icon-p">P</div>
                         <div class="side-text">任务目标</div>
-                        <div class="side-badge">未来 1 天风速</div>
+                        <small class="input-item-note">灵活定义</small>
                     </button>
                 </div>
 
@@ -3318,15 +3331,15 @@
                 <!-- 右侧：输出 -->
                 <div class="side-panel" id="panel-output">
                     <div class="side-title">输出</div>
-                    <button class="side-item side-action-item" type="button" onclick="openModule('forecast-output')" aria-label="查看预测输出结果介绍">
+                    <button class="side-item side-action-item" type="button" onclick="openModule('forecast-output')" aria-label="查看预测结果介绍">
                         <div class="side-icon">📉</div>
-                        <div class="side-text">预测输出<br>结果</div>
-                        <div class="side-badge">曲线与区间</div>
+                        <div class="side-text">预测结果</div>
+                        <small class="input-item-note">曲线与区间</small>
                     </button>
                     <button class="side-item side-action-item" type="button" onclick="openModule('summary-doc')" aria-label="查看总结文档介绍" style="margin-bottom: 0;">
                         <div class="side-icon">📄</div>
                         <div class="side-text">总结文档</div>
-                        <div class="side-badge">全链路记录</div>
+                        <small class="input-item-note">全链路记录</small>
                     </button>
                 </div>
 
@@ -3445,13 +3458,13 @@
                 visual: renderFeedbackLab
             },
             'forecast-output': {
-                title: "预测输出结果",
-                value: "本模块将预测 Agent 的结果整理为可直接使用的预测曲线、可信区间和关键指标，并按照任务要求输出对应时间范围和粒度的数据。解决预测结果格式不统一、风险边界不清晰、调度与运营人员难以快速使用的问题。",
+                title: "预测结果",
+                value: "本模块将预测 Agent 生成的结果整理为清晰的预测曲线、可信范围和关键指标，便于调度和运营人员快速判断未来出力走势与风险边界。解决预测结果格式不统一、业务人员难以快速使用的问题。",
                 visual: renderForecastOutputIntro
             },
             'summary-doc': {
                 title: "总结文档",
-                value: "本模块自动汇总数据质量、任务目标、方案选择、训练与预测日志、结果指标及误差诊断，形成可下载、可复核的全链路文档。解决预测过程难追踪、决策依据难说明、项目交付依赖人工整理的问题。",
+                value: "本模块自动汇总数据质量、任务目标、方案选择、训练与预测日志、结果指标及误差诊断，形成可复核的全链路总结文档。解决预测过程难追踪、决策依据难说明、项目交付依赖人工整理的问题。",
                 visual: renderSummaryDocIntro
             }
         };
@@ -3494,7 +3507,9 @@
         // 弹窗控制逻辑
         function openModule(modId) {
             const data = modulesData[modId];
-            document.querySelector('.modal-content').classList.toggle('weather-modal', modId === 'weather');
+            const modalContent = document.querySelector('.modal-content');
+            modalContent.classList.toggle('weather-modal', modId === 'weather');
+            modalContent.classList.toggle('info-modal', ['timeseries', 'target', 'forecast-output', 'summary-doc'].includes(modId));
             document.getElementById('mod-title').innerText = data.title;
             document.getElementById('mod-value').innerText = data.value;
             document.getElementById('mod-visual').innerHTML = data.visual();
@@ -3532,6 +3547,7 @@
             // 动态加载视频
             const slot = document.getElementById('video-slot');
             const videoWrapper = document.getElementById('video-wrapper');
+            pauseScenarioMedia();
             videoWrapper.classList.toggle('dual-video-layout', Array.isArray(data.videos));
             if (Array.isArray(data.videos)) {
                 slot.innerHTML = data.videos.map(function (video, index) {
@@ -3562,9 +3578,38 @@
 
         function goHome() {
             document.getElementById('view-scenario').classList.remove('active');
+            pauseScenarioMedia();
             window.scrollTo(0, 0);
             document.getElementById('view-home').classList.add('active');
         }
+
+        function pauseScenarioMedia() {
+            const media = document.querySelectorAll('#video-wrapper video');
+            media.forEach(function (video) {
+                try {
+                    video.pause();
+                    video.currentTime = 0;
+                } catch (err) {
+                    // 忽略个别浏览器对未就绪视频的限制
+                }
+            });
+        }
+
+        function updateCanvasScale() {
+            const wrapper = document.querySelector('.canvas-wrapper');
+            if (!wrapper) return;
+            const availableWidth = Math.max(320, window.innerWidth - 48);
+            const baseWidth = 1480;
+            const scale = Math.min(0.95, Math.max(0.58, availableWidth / baseWidth * 0.9));
+            wrapper.style.setProperty('--canvas-scale', scale.toFixed(3));
+        }
+
+        let canvasScaleRaf = null;
+        window.addEventListener('resize', function () {
+            if (canvasScaleRaf) cancelAnimationFrame(canvasScaleRaf);
+            canvasScaleRaf = requestAnimationFrame(updateCanvasScale);
+        });
+        updateCanvasScale();
 
         /* ========================================================
            四大核心模块：交互动画实验台
@@ -4050,7 +4095,7 @@
         function renderTimeSeriesIntro() {
             return renderInfoIntro({
                 accent: '#8a1c52',
-                kicker: 'Endogenous Time-series Input',
+                kicker: 'ENDOGENOUS TIME-SERIES INPUT',
                 headline: '记录场站自身的历史运行过程，形成可用于预测的内生变量',
                 cards: [
                     { icon: '📡', title: '场站内部信号', copy: '历史出力、设备状态、控制记录等持续回流。' },
@@ -4065,11 +4110,11 @@
         function renderTargetIntro() {
             return renderInfoIntro({
                 accent: '#7c3aed',
-                kicker: 'Prediction Task Definition',
+                kicker: 'PREDICTION TASK DEFINITION',
                 headline: '把业务需求转化为清晰、可执行、可验收的预测任务',
                 cards: [
                     { icon: '🎯', title: '预测对象', copy: '明确预测风速、风电出力、光伏出力或其他目标。' },
-                    { icon: '📅', title: '预测范围', copy: '明确从当前时刻向未来预测多长时间。' },
+                    { icon: '🗓️', title: '预测范围', copy: '明确从当前时刻向未来预测多长时间。' },
                     { icon: '⏱️', title: '结果粒度', copy: '明确时间间隔、更新频率和结果交付要求。' }
                 ],
                 example: '任务示例：<strong>预测未来 1 天的风速</strong>，每 15 分钟输出一个预测值',
@@ -4081,15 +4126,15 @@
         function renderForecastOutputIntro() {
             return renderInfoIntro({
                 accent: '#d97706',
-                kicker: 'Forecast Deliverable',
-                headline: '把预测结果整理为调度与运营人员可直接使用的业务交付物',
+                kicker: 'Forecast Result',
+                headline: '把预测 Agent 的计算结果整理为可读、可用的预测结果',
                 cards: [
-                    { icon: '📈', title: '预测曲线', copy: '按任务要求给出未来各时刻的预测值。' },
-                    { icon: '🛡️', title: '可信范围', copy: '同步展示上下边界，帮助识别可能的波动风险。' },
-                    { icon: '📤', title: '标准化输出', copy: '按统一时间粒度和格式交付，便于业务系统直接使用。' }
+                    { icon: '📉', title: '预测曲线', copy: '展示未来各时刻的预测结果，支撑调度和运营判断。' },
+                    { icon: '🛡️', title: '可信范围', copy: '同步呈现上下边界，帮助识别潜在波动和风险。' },
+                    { icon: '📊', title: '关键指标', copy: '汇总误差、稳定性和任务相关指标，便于快速复核。' }
                 ],
                 statusLabel: '核心交付',
-                statusValue: '预测值、可信区间与关键指标口径一致'
+                statusValue: '预测结果清晰呈现，可直接进入业务决策'
             });
         }
 
@@ -4099,9 +4144,9 @@
                 kicker: 'Traceable Summary Document',
                 headline: '自动沉淀从输入、决策到结果与诊断的全链路记录',
                 cards: [
-                    { icon: '🗂️', title: '输入与任务摘要', copy: '记录数据范围、数据质量和本次任务目标。' },
-                    { icon: '🧭', title: '方案与执行记录', copy: '记录方案选择依据、训练日志和预测日志。' },
-                    { icon: '📄', title: '结果与诊断结论', copy: '汇总预测指标、偏差归因和后续改进建议。' }
+                    { icon: '🗂️', title: '输入摘要', copy: '记录数据范围、数据质量和本次任务目标。' },
+                    { icon: '🧭', title: '过程记录', copy: '记录方案选择依据、训练日志和预测日志。' },
+                    { icon: '📄', title: '结果总结', copy: '汇总预测指标、偏差归因和后续改进建议。' }
                 ],
                 statusLabel: '文档价值',
                 statusValue: '链路可追溯、决策可复核、结果可交付'
