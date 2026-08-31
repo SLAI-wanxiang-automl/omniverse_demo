@@ -5,6 +5,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>明月•万象 Agentic AutoML - 交互式演示平台</title>
+    <link rel="icon" href="data:,">
     <style>
         :root {
             --primary-color: #8a1c52;
@@ -855,6 +856,12 @@
             margin-top: -30px;
         }
 
+        .overall-entry {
+            text-align: center;
+            width: 1100px;
+            margin-top: 42px;
+        }
+
         .entry-title {
             display: inline-block;
             background: var(--text-main);
@@ -880,6 +887,10 @@
             display: flex;
             gap: 20px;
             justify-content: space-between;
+        }
+
+        .single-card-wrapper {
+            justify-content: center;
         }
 
         .card {
@@ -919,6 +930,17 @@
             color: var(--text-muted);
             line-height: 1.5;
             text-align: center;
+        }
+
+        .overall-card {
+            max-width: 420px;
+            border-color: rgba(138, 28, 82, 0.25);
+            background: linear-gradient(180deg, #ffffff 0%, #fdf2f8 100%);
+        }
+
+        .overall-card:hover {
+            border-color: var(--primary-color);
+            box-shadow: 0 15px 30px rgba(138, 28, 82, 0.12);
         }
 
         /* ================= 场景详情页 ================= */
@@ -1090,9 +1112,10 @@
             transform: scale(1.05);
         }
 
-        /* ================= 首页：双入口导航条 ================= */
+        /* ================= 首页：入口导航条 ================= */
         .top-entries {
             display: flex;
+            flex-wrap: wrap;
             gap: 16px;
             justify-content: center;
             margin: 18px 0 6px;
@@ -3226,14 +3249,15 @@
             <p class="system-tagline">决策自动化，链路可溯源，误差可归因</p>
         </div>
 
-        <!-- 双入口导航 -->
+        <!-- 首页入口导航 -->
         <div class="top-entries">
-            <div class="entry-pill" onclick="openModule('automl')">查看各模块功能介绍</div>
+            <div class="entry-pill" onclick="scrollToModules()">查看各模块功能介绍</div>
             <div class="entry-pill" onclick="scrollToScenarios()">典型业务场景演示</div>
+            <div class="entry-pill" onclick="scrollToOverallVideo()">查看完整系统介绍视频</div>
         </div>
 
         <!-- 高保真系统框图区 -->
-        <div class="canvas-wrapper">
+        <div class="canvas-wrapper" id="module-section">
             <div class="canvas">
 
                 <!-- 左侧：输入 -->
@@ -3377,6 +3401,17 @@
                 </div>
             </div>
         </div>
+
+        <div class="overall-entry" id="overall-video-section">
+            <div class="entry-title">查看完整系统介绍视频</div>
+            <div class="cards-wrapper single-card-wrapper">
+                <div class="card overall-card" onclick="openScenario('overall')">
+                    <div class="card-icon">🎬</div>
+                    <div class="card-title">完整系统演示视频</div>
+                    <div class="card-desc">端到端介绍明月•万象系统<br>完整演示全链路运行过程</div>
+                </div>
+            </div>
+        </div>
     </div>
 
     <!-- 视图 2：场景详情页 -->
@@ -3501,6 +3536,12 @@
                         src: "scene/scene3.2.mp4"
                     }
                 ]
+            },
+            'overall': {
+                title: "完整系统介绍视频",
+                context: "明月•万象 Agentic AutoML 全维智控体系完整演示，覆盖数据输入、智能体协同、预测生成、解释诊断与闭环反馈的端到端流程。",
+                value: "通过完整系统演示，可以快速了解明月•万象从多源数据接入到预测结果交付、误差归因和持续优化的全链路能力。",
+                video: "scene/overall.mp4"
             }
         };
 
@@ -3525,8 +3566,16 @@
         }
 
         // 滚动到场景入口区
+        function scrollToModules() {
+            document.getElementById('module-section').scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+
         function scrollToScenarios() {
             document.getElementById('scenario-section').scrollIntoView({ behavior: 'smooth' });
+        }
+
+        function scrollToOverallVideo() {
+            document.getElementById('overall-video-section').scrollIntoView({ behavior: 'smooth' });
         }
 
         // 场景页面切换逻辑
@@ -3540,6 +3589,7 @@
             if (scenId === 's1') borderColor = "#f59e0b"; // 场景一：黄
             if (scenId === 's2') borderColor = "#10b981"; // 场景二：绿
             if (scenId === 's3') borderColor = "#8a1c52"; // 场景三：紫红
+            if (scenId === 'overall') borderColor = "#8a1c52"; // 完整系统视频：紫红
             document.querySelector('.value-statement').style.borderLeftColor = borderColor;
 
             document.getElementById('scen-value').innerText = data.value;
